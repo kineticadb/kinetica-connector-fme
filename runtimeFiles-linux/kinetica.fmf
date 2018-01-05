@@ -1,0 +1,290 @@
+! --------------------------------------------------------------------------------
+! KINETICA format metafile
+! -------------------------------------------------------------------------------
+! --------------------------------------------------------------------------------
+! Define the format name.
+! --------------------------------------------------------------------------------
+DEFAULT_MACRO FORMAT_SHORT_NAME KINETICA
+SOURCE_READER KINETICA EXPOSED_ATTRS  "$($(FORMAT_SHORT_NAME)_EXPOSE_FORMAT_ATTRS)" -URL "$(URL)"  -TABLENAME "$(TABLENAME)" -USER_NAME "$(USER_NAME)" -PASSWORD "$(PASSWORD)" 
+FORMAT_NAME   KINETICA
+FORMAT_TYPE DYNAMIC
+DYNAMIC_LIBRARY KINETICA
+
+MACRO _InvalidCharacters \\/\":?*<>|[%# '&+-].
+
+FEATURE_TYPE_INVALID_CHARS "$(_InvalidCharacters)"
+! --------------------------------------------------------------------------------
+! Specify the def line and correlation line templates.
+! --------------------------------------------------------------------------------
+DEF_LINE_TEMPLATE {FME_GEN_GROUP_NAME}
+CORR_LINE_TEMPLATE {FME_GEN_GROUP_NAME} kinetica_type {FME_GEN_GEOMETRY}
+DEF_LINE_BREAK ATTRIB_CHANGE
+
+
+! --------------------------------------------------------------------------------
+! Define the source preamble.
+! --------------------------------------------------------------------------------
+
+SOURCE_PREAMBLE
+_
+GUI TEXT SourceDataset Source Kinetica Database(s):
+_
+END_SOURCE_PREAMBLE
+
+SOURCE_SETTINGS
+
+DEFAULT_VALUE URL $(URL)
+GUI TEXT URL URL:
+
+DEFAULT_VALUE TABLENAME ""
+GUI TEXT TABLENAME Table:
+
+DEFAULT_VALUE EXPRESSION ""
+GUI OPTIONAL TEXT EXPRESSION Expression:
+
+DEFAULT_VALUE USER_NAME $(USER_NAME)
+GUI OPTIONAL TEXT USER_NAME Username:
+
+DEFAULT_VALUE PASSWORD $(PASSWORD)
+GUI OPTIONAL PASSWORD_ENCODED PASSWORD Password:
+
+DEFAULT_VALUE EXPOSE_ATTRS_GROUP $(EXPOSE_ATTRS_GROUP)
+GUI DISCLOSUREGROUP EXPOSE_ATTRS_GROUP $(FORMAT_SHORT_NAME)_EXPOSE_FORMAT_ATTRS Schema Attributes
+INCLUDE exposeFormatAttrs.fmi
+INCLUDE searchEnvelopeExternal.fmi
+
+END_SOURCE_SETTINGS
+
+
+
+SOURCE_DATASET \"$[SourceDataset]\"
+
+! --------------------------------------------------------------------------------
+! Define the destination preamble.
+! --------------------------------------------------------------------------------
+DESTINATION_PREAMBLE
+_
+GUI DIRNAME DestDataset Destination Kinetica Folder:
+__
+END_DESTINATION_PREAMBLE
+
+DESTINATION_SETTINGS
+
+! ------------------------------------------------------------------------------
+! Specify generic option for destination dataset type validation
+! against format type. This file defaults to opting in.
+! ------------------------------------------------------------------------------
+!INCLUDE destinationDatasetTypeValidation.fmi
+
+DEFAULT_VALUE URL $(URL)
+-GUI TEXT URL URL:
+__
+-DEFAULT_VALUE DATASET $(DATASET)
+-GUI TEXT DATASET Table: 
+__
+
+DEFAULT_VALUE COLLECTION_NAME ""
+-GUI OPTIONAL TEXT COLLECTION_NAME Collection: 
+__
+
+!--------------------------------------------------------------------
+! PR43250: Allow users to omit geometry from the feature objects.
+!--------------------------------------------------------------------
+DEFAULT_VALUE WRITE_GEOMETRY Yes
+GUI ACTIVEDISCLOSUREGROUP WRITE_GEOMETRY GEOMETRY_KEY Write Geometry
+!--------------------------------------------------------------------
+! Get the object key to write the geometry to
+!--------------------------------------------------------------------
+DEFAULT_VALUE GEOMETRY_KEY $(GEOMETRY_KEY)
+-GUI TEXT GEOMETRY_KEY Geometry Field Name:
+
+
+!--------------------------------------------------------------------
+! PR43250: Allow users to write points to x,y fields
+!--------------------------------------------------------------------
+DEFAULT_VALUE WRITE_POINTS Yes
+GUI ACTIVEDISCLOSUREGROUP WRITE_POINTS POINT_X%POINT_Y Write Points
+!--------------------------------------------------------------------
+! Get the object keys to write the point to
+!--------------------------------------------------------------------
+DEFAULT_VALUE POINT_X $(POINT_X)
+-GUI TEXT POINT_X X Field Name:
+
+DEFAULT_VALUE POINT_Y $(POINT_Y)
+-GUI TEXT POINT_Y Y Field Name:
+
+__
+DEFAULT_VALUE USER_NAME $(USER_NAME)
+GUI OPTIONAL TEXT USER_NAME Username:
+__
+DEFAULT_VALUE PASSWORD $(PASSWORD)
+GUI OPTIONAL PASSWORD PASSWORD Password:
+__
+
+
+END_DESTINATION_SETTINGS
+
+DESTINATION_DATASET \"$[DestDataset]\"
+
+PREAMBLE
+
+END_PREAMBLE
+
+! --------------------------------------------------------------------------------
+! Map different Kinetica types to their FME types using GEOM_MAP table entries.
+! --------------------------------------------------------------------------------
+GEOM_MAP kinetica_point                fme_point
+
+GEOM_MAP kinetica_line                 fme_line
+
+GEOM_MAP kinetica_polygon              fme_polygon
+
+! --------------------------------------------------------------------------------
+! NOTE: If your format does not support arcs, then fme_arc should
+! be mapped to the same <format>_type to which fme_line has been
+! mapped. For example, the GEOM_MAP line would be:
+!  GEOM_MAP kinetica_line            fme_arc                \
+!           fme_primary_axis         fme_primary_axis       \
+!           fme_secondary_axis       fme_secondary_axis     \
+!           fme_rotation             fme_rotation           \
+!           fme_start_angle          fme_start_angle        \
+!           fme_sweep_angle          fme_sweep_angle        \
+!           @Arc(&fme_primary_axis,&fme_secondary_axis,0, &fme_rotation,&fme_start_angle,&fme_sweep_angle)
+! The last line containing the function @Arc() strokes the arc
+! into a line; it is very important and must be present.
+! --------------------------------------------------------------------------------
+
+GEOM_MAP kinetica_arc             fme_arc                \
+         fme_primary_axis         fme_primary_axis       \
+         fme_secondary_axis       fme_secondary_axis     \
+         fme_rotation             fme_rotation           \
+         fme_start_angle          fme_start_angle        \
+         fme_sweep_angle          fme_sweep_angle        
+         
+GEOM_MAP kinetica_text            fme_text               \
+         fme_text_string          fme_text_string        \
+         fme_text_size            fme_text_size          \
+         fme_rotation             fme_rotation           
+
+GEOM_MAP kinetica_multi_text      fme_text               \
+         fme_text_string          fme_text_string        \
+         fme_rotation             fme_rotation           \
+         fme_text_size            fme_text_size          
+         
+! --------------------------------------------------------------------------------
+! NOTE: If your format does not support ellipses, then fme_ellipse should
+! be mapped to the same <format>_type to which fme_polygon has been
+! mapped. For example, the GEOM_MAP line would be:
+!  GEOM_MAP kinetica_polygon         fme_ellipse            \
+!           fme_primary_axis         fme_primary_axis       \
+!           fme_secondary_axis       fme_secondary_axis     \
+!           fme_rotation             fme_rotation           \
+!           @Arc(0, MAKEPOLY_FOR_360ARC)
+! The last line containing the function @Arc() strokes the ellipse
+! into a polygon; it is very important and must be present.
+! --------------------------------------------------------------------------------
+
+GEOM_MAP kinetica_ellipse         fme_ellipse            \
+         fme_primary_axis         fme_primary_axis       \
+         fme_secondary_axis       fme_secondary_axis     \
+         fme_rotation             fme_rotation
+
+         
+GEOM_MAP kinetica_polygon         fme_rectangle          
+         
+GEOM_MAP kinetica_polygon         fme_rounded_rectangle  
+
+GEOM_MAP kinetica_collection      fme_collection         
+
+GEOM_MAP kinetica_surface         fme_surface
+
+GEOM_MAP kinetica_solid           fme_solid
+
+GEOM_MAP kinetica_null            fme_no_geom            
+         
+GEOM_MAP fme_no_map               fme_no_geom
+
+
+! --------------------------------------------------------------------------------
+! Define the mappings of the attribute types.
+! --------------------------------------------------------------------------------
+ ATTR_TYPE_MAP                                                     \
+                string		            fme_varchar(width)         \
+                string		            fme_char(width)            \
+                string		            fme_binary(width)          \
+                string                  fme_buffer                 \
+                datetime                fme_datetime               \
+                real64                  fme_real64                 \
+                real32                  fme_real32                 \
+                char                    fme_int8                   \
+                int16                   fme_int16                  \
+                int32                   fme_int32                  \
+                int64                   fme_int64                  \
+                real64				    fme_decimal(width,decimal)				
+
+!                uint8                   fme_uint8                  \
+!                uint16                  fme_uint16                 \
+!                uint32                  fme_uint32                 \
+!                uint64                  fme_uint64                 \
+!                char(width)             fme_varbinary(width)       \
+!                string                  fme_binarybuffer           \
+!                string                  fme_xml                    \
+!                string                  fme_json                   \
+!                logical                 fme_boolean                \
+!                datetime                fme_time                   \
+!                datetime                fme_date                   \
+!                real64				    fme_decimal(width,decimal) \
+
+
+! --------------------------------------------------------------------------------
+! Define the attribute case for Kinetica attributes. Kinetica doesn't
+! care about the case of its attributes.
+! --------------------------------------------------------------------------------
+ATTRIBUTE_CASE ANY
+
+! --------------------------------------------------------------------------------
+! Define the length of the attributes stored within the dataset.
+! Kinetica doesn't care about this either so let's make it 600.
+! --------------------------------------------------------------------------------
+ATTRIBUTE_LENGTH 600
+
+! --------------------------------------------------------------------------------
+! For genericization support, we must identify which attribute holds the
+! 'geometry type' of the feature since the CORR_LINE_TEMPLATE does not.
+! --------------------------------------------------------------------------------
+GENERICIZE_GEOMTYPE_ATTR_NAME kinetica_type
+
+
+! ------------------------------------------------------------------------------
+! [PR#18999] Added search envelope and hard clip options are placed under Advanced
+! Until the nav NODE is completed
+! ------------------------------------------------------------------------------
+INCLUDE [if { ("$(FMEGEN_DIRECTION)" == "Source") } { \
+            set line "FORMAT_PARAMETER ADVANCED_PARMS"; \
+            append line { $(FMEGEN_SOURCE_FORMAT)_IN_SEARCH_ENVELOPE_MINX}; \
+            append line { $(FMEGEN_SOURCE_FORMAT)_IN_SEARCH_ENVELOPE_MINY}; \
+            append line { $(FMEGEN_SOURCE_FORMAT)_IN_SEARCH_ENVELOPE_MAXX}; \
+            append line { $(FMEGEN_SOURCE_FORMAT)_IN_SEARCH_ENVELOPE_MAXY}; \
+            append line { $(FMEGEN_SOURCE_FORMAT)_IN_CLIP_TO_ENVELOPE}; \
+            append line { SEARCH_ENVELOPE_COORDINATE_SYSTEM}; \
+            puts $line; \
+         } ]
+         
+! ------------------------------------------------------------------------------
+! Setting the INVALID characters which cannot be used for file names
+! \ / " : ? * < > | are the invalid characters for windows file system
+! & is extra invalid character as well.
+! ------------------------------------------------------------------------------
+MACRO _InvalidCharacters \\/\":?*<>|&
+
+FEATURE_TYPE_INVALID_CHARS "$(_InvalidCharacters)"
+
+!WORKBENCH_ATTR_INDEX_TYPES BTREE HASH PRIKEY NOTNULL NULL PRIMARYKEY
+! ----------------------------------------------------------------------
+! The attribute index types, for Workbench
+!WORKBENCH_ATTR_INDEX_TYPES PRIMARYKEY NULLABLE CHAR1 CHAR2 CHAR4 CHAR8 CHAR16 CHAR32 CHAR64 CHAR128 CHAR256 IPV4 disk_optimized store_only text_search
+WORKBENCH_ATTR_INDEX_TYPES primary_key disk_optimized store_only text_search
+
+FORMAT_PARAMETER DATASET_NAME Database
+FORMAT_PARAMETER FEATURE_TYPE_NAME Table
+FORMAT_PARAMETER FEATURE_TYPE_DEFAULT_NAME Table1

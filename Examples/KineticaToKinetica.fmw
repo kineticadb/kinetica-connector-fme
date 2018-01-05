@@ -1,0 +1,796 @@
+#! <?xml version="1.0" encoding="UTF-8" ?>
+#! <WORKSPACE
+#    
+#    
+#    Command-line to run this workspace:
+#    
+#    
+#    "C:\Program Files\FME\fme.exe" "C:\Program Files\FME\pluginbuilder\gpudb-connector-fme\Tests\KineticaToKinetica.fmw"
+#          --SourceDataset_KINETICA "abcd"
+#          --DestDataset_KINETICA "test_fme_table2"
+#    
+#    
+#!   USE_MARKDOWN=""
+#!   PYTHON_COMPATIBILITY="27"
+#!   EXPLICIT_BOOKMARK_ORDER="false"
+#!   LAST_SAVE_BUILD="FME(R) 2017.1.1.1 (20171014 - Build 17652 - WIN32)"
+#!   FME_SERVER_SERVICES=""
+#!   FME_IMPLICIT_CSMAP_REPROJECTION_MODE="Auto"
+#!   DESTINATION="NONE"
+#!   FME_STROKE_MAX_DEVIATION="0"
+#!   IGNORE_READER_FAILURE="No"
+#!   DOC_EXTENTS="1016.52 1e-05"
+#!   TITLE=""
+#!   SOURCE="NONE"
+#!   ZOOM_SCALE="100"
+#!   SHOW_INFO_NODES="true"
+#!   MARKDOWN_USAGE=""
+#!   FME_GEOMETRY_HANDLING="Enhanced"
+#!   MAX_LOG_FEATURES="200"
+#!   VIEW_POSITION="-62.5006 0"
+#!   FME_DOCUMENT_GUID="1895cbd1-7549-4cc0-8691-6dfcad469438"
+#!   ATTR_TYPE_ENCODING="SDF"
+#!   HISTORY=""
+#!   MULTI_WRITER_DATASET_ORDER="BY_ID"
+#!   BEGIN_PYTHON=""
+#!   DOC_TOP_LEFT="100 -230"
+#!   LAST_SAVE_DATE="2017-12-05T10:12:24"
+#!   DESTINATION_ROUTING_FILE=""
+#!   DESCRIPTION=""
+#!   LOG_FILE=""
+#!   SHOW_ANNOTATIONS="true"
+#!   FME_REPROJECTION_ENGINE="FME"
+#!   FME_BUILD_NUM="17652"
+#!   FME_DOCUMENT_PRIORGUID=""
+#!   REDIRECT_TERMINATORS="NONE"
+#!   END_PYTHON=""
+#!   WORKSPACE_VERSION="1"
+#!   WARN_INVALID_XFORM_PARAM="Yes"
+#!   END_TCL=""
+#!   CATEGORY=""
+#!   TERMINATE_REJECTED="YES"
+#!   SOURCE_ROUTING_FILE=""
+#!   USAGE=""
+#!   PASSWORD=""
+#!   MARKDOWN_DESCRIPTION=""
+#!   LOG_MAX_RECORDED_FEATURES="200"
+#!   BEGIN_TCL=""
+#! >
+#! <DATASETS>
+#! <DATASET
+#!   IS_SOURCE="true"
+#!   ROLE="READER"
+#!   FORMAT="KINETICA"
+#!   DATASET="$(SourceDataset_KINETICA)"
+#!   KEYWORD="KINETICA_1"
+#!   MULTI_GEOM_ALLOWED="false"
+#!   ATTR_MAX_LENGTH="0"
+#!   ATTR_CASE="ANY"
+#!   ALLOWED_FEAT_TYPES=""
+#!   WRITE_DEFS="true"
+#!   DEFLINE_TEMPLATE=""
+#!   DEFLINE_ATTRS="true"
+#!   EXPOSABLE_ATTRS="fme_rotation real64 multi_reader_id int32 fme_secondary_axis real64 fme_text_size real64 fme_feature_type string fme_dataset string fme_sweep_angle real64 fme_basename string fme_start_angle real64 fme_fill_color string multi_reader_full_id int32 fme_geometry fme_char(50) fme_color string fme_text_string string multi_reader_type string multi_reader_keyword string fme_primary_axis real64 fme_type string"
+#!   DEFLINE_PARMS=""
+#!   ATTR_INDEX_TYPES="primary_key disk_optimized store_only text_search"
+#!   ATTR_NAME_INVALID_CHARS=""
+#!   SUPPORTS_FEATURE_TYPE_FANOUT="true"
+#!   ENABLED="true"
+#!   DYNAMIC_FEATURE_TYPES_LIST_ON_MERGE="true"
+#!   DATASET_TYPE="DATABASE"
+#!   GENERATE_FME_BUILD_NUM="17652"
+#!   MAX_FEATURES=""
+#!   COORDSYS=""
+#!   FEATURE_TYPES=""
+#!   START_FEATURE=""
+#!   MAX_FEATURES_PER_FEATURE_TYPE=""
+#!   MIN_FEATURES=""
+#! >
+#! <METAFILE_PARAMETER
+#!   NAME="DATASET_NAME"
+#!   VALUE="Database"
+#! />
+#! <METAFILE_PARAMETER
+#!   NAME="ADVANCED_PARMS"
+#!   VALUE="KINETICA_IN_SEARCH_ENVELOPE_MINX KINETICA_IN_SEARCH_ENVELOPE_MINY KINETICA_IN_SEARCH_ENVELOPE_MAXX KINETICA_IN_SEARCH_ENVELOPE_MAXY KINETICA_IN_CLIP_TO_ENVELOPE SEARCH_ENVELOPE_COORDINATE_SYSTEM"
+#! />
+#! <METAFILE_PARAMETER
+#!   NAME="FEATURE_TYPE_NAME"
+#!   VALUE="Table"
+#! />
+#! <METAFILE_PARAMETER
+#!   NAME="FEATURE_TYPE_DEFAULT_NAME"
+#!   VALUE="Table1"
+#! />
+#! </DATASET>
+#! <DATASET
+#!   IS_SOURCE="false"
+#!   ROLE="WRITER"
+#!   FORMAT="KINETICA"
+#!   DATASET="$(DestDataset_KINETICA)"
+#!   KEYWORD="KINETICA_2"
+#!   MULTI_GEOM_ALLOWED="true"
+#!   ATTR_MAX_LENGTH="600"
+#!   ATTR_CASE="ANY"
+#!   ALLOWED_FEAT_TYPES=""
+#!   WRITE_DEFS="true"
+#!   DEFLINE_TEMPLATE=""
+#!   DEFLINE_ATTRS="true"
+#!   EXPOSABLE_ATTRS="fme_fill_color string fme_secondary_axis real64 fme_sweep_angle real64 fme_dataset string fme_basename string fme_color string fme_type string fme_geometry fme_char(50) fme_primary_axis real64 fme_text_string string fme_rotation real64 fme_text_size real64 fme_feature_type string fme_start_angle real64"
+#!   DEFLINE_PARMS=""
+#!   ATTR_INDEX_TYPES="primary_key disk_optimized store_only text_search"
+#!   ATTR_NAME_INVALID_CHARS=""
+#!   SUPPORTS_FEATURE_TYPE_FANOUT="true"
+#!   ENABLED="true"
+#!   DYNAMIC_FEATURE_TYPES_LIST_ON_MERGE="true"
+#!   DATASET_TYPE="DATABASE"
+#!   GENERATE_FME_BUILD_NUM="17652"
+#!   FANOUT_EXPRESSION=""
+#!   COORDSYS=""
+#!   FANOUT_GROUP="NO"
+#! >
+#! <METAFILE_PARAMETER
+#!   NAME="DATASET_NAME"
+#!   VALUE="Database"
+#! />
+#! <METAFILE_PARAMETER
+#!   NAME="FEATURE_TYPE_NAME"
+#!   VALUE="Table"
+#! />
+#! <METAFILE_PARAMETER
+#!   NAME="FEATURE_TYPE_DEFAULT_NAME"
+#!   VALUE="Table1"
+#! />
+#! </DATASET>
+#! </DATASETS>
+#! <DATA_TYPES>
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="string"
+#!   FME_TYPE="fme_varchar(width)"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="string"
+#!   FME_TYPE="fme_char(width)"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="string"
+#!   FME_TYPE="fme_binary(width)"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="string"
+#!   FME_TYPE="fme_buffer"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="datetime"
+#!   FME_TYPE="fme_datetime"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="real64"
+#!   FME_TYPE="fme_real64"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="real32"
+#!   FME_TYPE="fme_real32"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="char"
+#!   FME_TYPE="fme_int8"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="int16"
+#!   FME_TYPE="fme_int16"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="int32"
+#!   FME_TYPE="fme_int32"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="int64"
+#!   FME_TYPE="fme_int64"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="real64"
+#!   FME_TYPE="fme_decimal(width,decimal)"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="string"
+#!   FME_TYPE="fme_varchar(width)"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="string"
+#!   FME_TYPE="fme_char(width)"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="string"
+#!   FME_TYPE="fme_binary(width)"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="string"
+#!   FME_TYPE="fme_buffer"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="datetime"
+#!   FME_TYPE="fme_datetime"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="real64"
+#!   FME_TYPE="fme_real64"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="real32"
+#!   FME_TYPE="fme_real32"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="char"
+#!   FME_TYPE="fme_int8"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="int16"
+#!   FME_TYPE="fme_int16"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="int32"
+#!   FME_TYPE="fme_int32"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="int64"
+#!   FME_TYPE="fme_int64"
+#!   FORMAT="KINETICA"
+#! />
+#! <DATA_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="real64"
+#!   FME_TYPE="fme_decimal(width,decimal)"
+#!   FORMAT="KINETICA"
+#! />
+#! </DATA_TYPES>
+#! <GEOM_TYPES>
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_point"
+#!   FME_TYPE="fme_point"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_line"
+#!   FME_TYPE="fme_line"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_polygon"
+#!   FME_TYPE="fme_area"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_arc"
+#!   FME_TYPE="fme_arc"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_text"
+#!   FME_TYPE="fme_text"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_multi_text"
+#!   FME_TYPE="fme_text"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_ellipse"
+#!   FME_TYPE="fme_ellipse"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_polygon"
+#!   FME_TYPE="fme_rectangle"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_polygon"
+#!   FME_TYPE="fme_rounded_rectangle"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_collection"
+#!   FME_TYPE="fme_collection"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_surface"
+#!   FME_TYPE="fme_surface"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_solid"
+#!   FME_TYPE="fme_solid"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_null"
+#!   FME_TYPE="fme_no_geom"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="fme_no_map"
+#!   FME_TYPE="fme_no_geom"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_polygon"
+#!   FME_TYPE="fme_raster"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_polygon"
+#!   FME_TYPE="fme_point_cloud"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="true"
+#!   FORMAT_TYPE="kinetica_null"
+#!   FME_TYPE="fme_feature_table"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_point"
+#!   FME_TYPE="fme_point"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_line"
+#!   FME_TYPE="fme_line"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_polygon"
+#!   FME_TYPE="fme_area"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_arc"
+#!   FME_TYPE="fme_arc"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_text"
+#!   FME_TYPE="fme_text"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_multi_text"
+#!   FME_TYPE="fme_text"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_ellipse"
+#!   FME_TYPE="fme_ellipse"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_polygon"
+#!   FME_TYPE="fme_rectangle"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_polygon"
+#!   FME_TYPE="fme_rounded_rectangle"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_collection"
+#!   FME_TYPE="fme_collection"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_surface"
+#!   FME_TYPE="fme_surface"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_solid"
+#!   FME_TYPE="fme_solid"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_null"
+#!   FME_TYPE="fme_no_geom"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="fme_no_map"
+#!   FME_TYPE="fme_no_geom"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_polygon"
+#!   FME_TYPE="fme_raster"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_polygon"
+#!   FME_TYPE="fme_point_cloud"
+#!   FORMAT="KINETICA"
+#! />
+#! <GEOM_TYPE
+#!   IS_SOURCE="false"
+#!   FORMAT_TYPE="kinetica_null"
+#!   FME_TYPE="fme_feature_table"
+#!   FORMAT="KINETICA"
+#! />
+#! </GEOM_TYPES>
+#! <FEATURE_TYPES>
+#! <FEATURE_TYPE
+#!   IS_SOURCE="true"
+#!   NODE_NAME="KineticaFeatureType"
+#!   FEATURE_TYPE_NAME=""
+#!   FEATURE_TYPE_NAME_QUALIFIER=""
+#!   IS_EDITABLE="false"
+#!   IDENTIFIER="2"
+#!   FEAT_GEOMTYPE="kinetica_point"
+#!   POSITION="100 -230"
+#!   BOUNDING_RECT="100 -230 -1 -1"
+#!   ORDER="5e+14"
+#!   COLLAPSED="false"
+#!   KEYWORD="KINETICA_1"
+#!   PARMS_EDITED="true"
+#!   ENABLED="true"
+#!   HIDDEN_USER_ATTRS=""
+#!   MERGE_FILTER="*"
+#!   MERGE_FILTER_TYPE="FILTER_TYPE_GLOB"
+#!   MERGE_FILTER_CASE_SENSITIVE="true"
+#!   DYNAMIC_SCHEMA="false"
+#! >
+#!     <FEAT_ATTRIBUTE ATTR_NAME="y" ATTR_TYPE="real64" ATTR_HAS_PORT="true" ATTR_VALUE=""/>
+#!     <FEAT_ATTRIBUTE ATTR_NAME="x" ATTR_TYPE="real64" ATTR_HAS_PORT="true" ATTR_VALUE=""/>
+#!     <FEAT_ATTRIBUTE ATTR_NAME="TRACKID" ATTR_TYPE="string" ATTR_HAS_PORT="true" ATTR_VALUE=""/>
+#!     <FEAT_ATTRIBUTE ATTR_NAME="TIMESTAMP" ATTR_TYPE="real64" ATTR_HAS_PORT="true" ATTR_VALUE=""/>
+#! </FEATURE_TYPE>
+#! <FEATURE_TYPE
+#!   IS_SOURCE="false"
+#!   NODE_NAME="KineticaFeatureType"
+#!   FEATURE_TYPE_NAME=""
+#!   FEATURE_TYPE_NAME_QUALIFIER=""
+#!   IS_EDITABLE="true"
+#!   IDENTIFIER="3"
+#!   FEAT_GEOMTYPE="kinetica_point"
+#!   POSITION="1116.52 -230"
+#!   BOUNDING_RECT="1116.52 -230 -1 -1"
+#!   ORDER="5e+14"
+#!   COLLAPSED="false"
+#!   KEYWORD="KINETICA_2"
+#!   PARMS_EDITED="true"
+#!   ENABLED="true"
+#!   SCHEMA_ATTRIBUTE_SOURCE="1"
+#! >
+#!     <FEAT_ATTRIBUTE ATTR_NAME="y" ATTR_TYPE="real64" ATTR_HAS_PORT="true" ATTR_VALUE=""/>
+#!     <FEAT_ATTRIBUTE ATTR_NAME="x" ATTR_TYPE="real64" ATTR_HAS_PORT="true" ATTR_VALUE=""/>
+#!     <FEAT_ATTRIBUTE ATTR_NAME="TRACKID" ATTR_TYPE="string" ATTR_HAS_PORT="true" ATTR_VALUE=""/>
+#!     <FEAT_ATTRIBUTE ATTR_NAME="TIMESTAMP" ATTR_TYPE="real64" ATTR_HAS_PORT="true" ATTR_VALUE=""/>
+#! </FEATURE_TYPE>
+#! </FEATURE_TYPES>
+#! <FMESERVER>
+#! </FMESERVER>
+#! <GLOBAL_PARAMETERS>
+#! <GLOBAL_PARAMETER
+#!   GUI_LINE="GUI TEXT SourceDataset_KINETICA Source Kinetica Database(s):"
+#!   DEFAULT_VALUE="abcd"
+#!   IS_STAND_ALONE="false"
+#! />
+#! <GLOBAL_PARAMETER
+#!   GUI_LINE="GUI DIRNAME DestDataset_KINETICA Destination Kinetica Folder:"
+#!   DEFAULT_VALUE="test_fme_table2"
+#!   IS_STAND_ALONE="false"
+#! />
+#! </GLOBAL_PARAMETERS>
+#! <COMMENTS>
+#! </COMMENTS>
+#! <CONSTANTS>
+#! </CONSTANTS>
+#! <BOOKMARKS>
+#! </BOOKMARKS>
+#! <TRANSFORMERS>
+#! </TRANSFORMERS>
+#! <FEAT_LINKS>
+#! <FEAT_LINK
+#!   IDENTIFIER="4"
+#!   SOURCE_NODE="2"
+#!   TARGET_NODE="3"
+#!   SOURCE_PORT_DESC="-1"
+#!   TARGET_PORT_DESC="-1"
+#!   ENABLED="true"
+#!   EXECUTION_IDX="0"
+#!   HIDDEN="false"
+#!   EXTRA_POINTS=""
+#! />
+#! </FEAT_LINKS>
+#! <BREAKPOINTS>
+#! </BREAKPOINTS>
+#! <ATTR_LINKS>
+#! <ATTR_LINK
+#!   IDENTIFIER="65540"
+#!   SOURCE_NODE="2"
+#!   TARGET_NODE="3"
+#!   SOURCE_PORT_DESC="0"
+#!   TARGET_PORT_DESC="1"
+#! />
+#! <ATTR_LINK
+#!   IDENTIFIER="262148"
+#!   SOURCE_NODE="2"
+#!   TARGET_NODE="3"
+#!   SOURCE_PORT_DESC="3"
+#!   TARGET_PORT_DESC="3"
+#! />
+#! <ATTR_LINK
+#!   IDENTIFIER="131076"
+#!   SOURCE_NODE="2"
+#!   TARGET_NODE="3"
+#!   SOURCE_PORT_DESC="1"
+#!   TARGET_PORT_DESC="0"
+#! />
+#! <ATTR_LINK
+#!   IDENTIFIER="196612"
+#!   SOURCE_NODE="2"
+#!   TARGET_NODE="3"
+#!   SOURCE_PORT_DESC="2"
+#!   TARGET_PORT_DESC="2"
+#! />
+#! </ATTR_LINKS>
+#! <SUBDOCUMENTS>
+#! </SUBDOCUMENTS>
+#! <LOOKUP_TABLES>
+#! </LOOKUP_TABLES>
+#! </WORKSPACE>
+FME_PYTHON_VERSION 27
+GUI IGNORE SourceDataset_KINETICA_1,KINETICA_IN_URL_KINETICA_1,KINETICA_IN_TABLENAME_KINETICA_1,KINETICA_IN_EXPRESSION_KINETICA_1,KINETICA_IN_USER_NAME_KINETICA_1,KINETICA_IN_PASSWORD_KINETICA_1,KINETICA_IN_EXPOSE_ATTRS_GROUP_KINETICA_1,KINETICA_IN_SEARCH_ENVELOPE_MINX_KINETICA_1,KINETICA_IN_SEARCH_ENVELOPE_MINY_KINETICA_1,KINETICA_IN_SEARCH_ENVELOPE_MAXX_KINETICA_1,KINETICA_IN_SEARCH_ENVELOPE_MAXY_KINETICA_1,KINETICA_IN_SEARCH_ENVELOPE_COORDINATE_SYSTEM_KINETICA_1,KINETICA_IN_CLIP_TO_ENVELOPE_KINETICA_1,KINETICA_IN_NETWORK_AUTHENTICATION_KINETICA_1,DestDataset_KINETICA_2,KINETICA_OUT_WRITE_GEOMETRY_KINETICA_2,KINETICA_OUT_WRITE_POINTS_KINETICA_2,KINETICA_OUT_USER_NAME_KINETICA_2,KINETICA_OUT_PASSWORD_KINETICA_2
+DEFAULT_MACRO SourceDataset_KINETICA abcd
+GUI TEXT SourceDataset_KINETICA Source Kinetica Database(s):
+DEFAULT_MACRO DestDataset_KINETICA test_fme_table2
+GUI DIRNAME DestDataset_KINETICA Destination Kinetica Folder:
+INCLUDE [ if {{$(SourceDataset_KINETICA)} == {}} { puts_real {Parameter 'SourceDataset_KINETICA' must be given a value.}; exit 1; }; ]
+INCLUDE [ if {{$(DestDataset_KINETICA)} == {}} { puts_real {Parameter 'DestDataset_KINETICA' must be given a value.}; exit 1; }; ]
+#! START_HEADER
+#! START_WB_HEADER
+READER_TYPE KINETICA
+READER_KEYWORD KINETICA_1
+READER_GEN_DIRECTIVES SEARCH_ENVELOPE_MINY,0,USE_SEARCH_ENVELOPE,NO,CLIP_TO_ENVELOPE,NO,KINETICA_EXPOSE_FORMAT_ATTRS,,SEARCH_ENVELOPE_MAXY,0,TABLENAME,test_fme_table1,_MERGE_SCHEMAS,YES,URL,http:<solidus><solidus>172.30.195.3:9191,SEARCH_ENVELOPE_MINX,0,SEARCH_ENVELOPE_COORDINATE_SYSTEM,,USER_NAME,,EXPOSE_ATTRS_GROUP,FME_DISCLOSURE_CLOSED,EXPRESSION,,SEARCH_ENVELOPE_MAXX,0
+
+WRITER_TYPE MULTI_WRITER
+MULTI_WRITER_DATASET_ORDER BY_ID
+MULTI_WRITER_FIRST_WRITER_ID 0
+MULTI_WRITER_TYPE{0} KINETICA
+MULTI_WRITER_KEYWORD{0} KINETICA_2
+#! END_WB_HEADER
+
+#! START_WB_HEADER
+MACRO WB_KEYWORD "KINETICA_1"
+#! END_WB_HEADER
+#! START_SOURCE_HEADER KINETICA KINETICA_1
+# The dataset this mapping file was generated from was:
+#! END_SOURCE_HEADER
+#! START_WB_HEADER
+DEFAULT_MACRO SourceDataset
+INCLUDE [ if {{$(SourceDataset)} != ""} {                        \
+ puts {DEFAULT_MACRO SourceDataset_KINETICA_1 $(SourceDataset)}     \
+ } ]
+#! END_WB_HEADER
+#! START_SOURCE_HEADER KINETICA KINETICA_1
+DEFAULT_MACRO SourceDataset_KINETICA_1 $(SourceDataset_KINETICA)
+GUI TEXT SourceDataset_KINETICA_1 Source Kinetica Database(s):
+DEFAULT_MACRO KINETICA_IN_URL_KINETICA_1 http://172.30.195.3:9191
+KINETICA_1_URL "$(KINETICA_IN_URL_KINETICA_1)"
+GUI TEXT KINETICA_IN_URL_KINETICA_1 URL:
+DEFAULT_MACRO KINETICA_IN_TABLENAME_KINETICA_1 test_fme_table1
+KINETICA_1_TABLENAME "$(KINETICA_IN_TABLENAME_KINETICA_1)"
+GUI TEXT KINETICA_IN_TABLENAME_KINETICA_1 Table:
+DEFAULT_MACRO KINETICA_IN_EXPRESSION_KINETICA_1 (x > y) and (x > 0) and (y > 0)
+KINETICA_1_EXPRESSION "$(KINETICA_IN_EXPRESSION_KINETICA_1)"
+GUI OPTIONAL TEXT KINETICA_IN_EXPRESSION_KINETICA_1 Expression:
+DEFAULT_MACRO KINETICA_IN_USER_NAME_KINETICA_1 
+KINETICA_1_USER_NAME "$(KINETICA_IN_USER_NAME_KINETICA_1)"
+GUI OPTIONAL TEXT KINETICA_IN_USER_NAME_KINETICA_1 Username:
+DEFAULT_MACRO KINETICA_IN_PASSWORD_KINETICA_1 
+KINETICA_1_PASSWORD "$(KINETICA_IN_PASSWORD_KINETICA_1)"
+GUI OPTIONAL PASSWORD_ENCODED KINETICA_IN_PASSWORD_KINETICA_1 Password:
+DEFAULT_MACRO KINETICA_IN_EXPOSE_ATTRS_GROUP_KINETICA_1 FME_DISCLOSURE_CLOSED
+KINETICA_1_EXPOSE_ATTRS_GROUP "$(KINETICA_IN_EXPOSE_ATTRS_GROUP_KINETICA_1)"
+GUI OPTIONAL DISCLOSUREGROUP KINETICA_IN_EXPOSE_ATTRS_GROUP_KINETICA_1 KINETICA_IN_KINETICA_EXPOSE_FORMAT_ATTRS Schema Attributes
+# Include this file in source setting section to add external search envelope processing
+# Zero as a default means we don't do any search -- this makes workbench happier
+# ===========================================================================
+DEFAULT_MACRO KINETICA_IN_SEARCH_ENVELOPE_MINX_KINETICA_1 0
+KINETICA_1_SEARCH_ENVELOPE "$(KINETICA_IN_SEARCH_ENVELOPE_MINX_KINETICA_1)"
+GUI OPTIONAL FLOAT KINETICA_IN_SEARCH_ENVELOPE_MINX_KINETICA_1 Minimum X:
+# ===========================================================================
+DEFAULT_MACRO KINETICA_IN_SEARCH_ENVELOPE_MINY_KINETICA_1 0
+KINETICA_1_SEARCH_ENVELOPE "$(KINETICA_IN_SEARCH_ENVELOPE_MINY_KINETICA_1)"
+GUI OPTIONAL FLOAT KINETICA_IN_SEARCH_ENVELOPE_MINY_KINETICA_1 Minimum Y:
+# ===========================================================================
+DEFAULT_MACRO KINETICA_IN_SEARCH_ENVELOPE_MAXX_KINETICA_1 0
+KINETICA_1_SEARCH_ENVELOPE "$(KINETICA_IN_SEARCH_ENVELOPE_MAXX_KINETICA_1)"
+GUI OPTIONAL FLOAT KINETICA_IN_SEARCH_ENVELOPE_MAXX_KINETICA_1 Maximum X:
+# ===========================================================================
+DEFAULT_MACRO KINETICA_IN_SEARCH_ENVELOPE_MAXY_KINETICA_1 0
+KINETICA_1_SEARCH_ENVELOPE "$(KINETICA_IN_SEARCH_ENVELOPE_MAXY_KINETICA_1)"
+GUI OPTIONAL FLOAT KINETICA_IN_SEARCH_ENVELOPE_MAXY_KINETICA_1 Maximum Y:
+# ===========================================================================
+DEFAULT_MACRO KINETICA_IN_SEARCH_ENVELOPE_COORDINATE_SYSTEM_KINETICA_1 
+KINETICA_1_SEARCH_ENVELOPE "$(KINETICA_IN_SEARCH_ENVELOPE_COORDINATE_SYSTEM_KINETICA_1)"
+GUI OPTIONAL COORDSYS KINETICA_IN_SEARCH_ENVELOPE_COORDINATE_SYSTEM_KINETICA_1 Search Envelope Coordinate System:
+# ===========================================================================
+# BUG18999: We now have a soft clip to fall back on like native spatial index
+# thus we are reintroducing the clip to envelop as an option for users.
+# Defualt to soft clip as per the existing database readers we are emulating
+DEFAULT_MACRO KINETICA_IN_CLIP_TO_ENVELOPE_KINETICA_1 NO
+KINETICA_1_CLIP_TO_ENVELOPE "$(KINETICA_IN_CLIP_TO_ENVELOPE_KINETICA_1)"
+GUI OPTIONAL CHECKBOX KINETICA_IN_CLIP_TO_ENVELOPE_KINETICA_1 YES%NO Clip to Search Envelope
+# ===========================================================================
+DEFAULT_MACRO KINETICA_IN_NETWORK_AUTHENTICATION_KINETICA_1 
+KINETICA_1_NETWORK_AUTHENTICATION "$(KINETICA_IN_NETWORK_AUTHENTICATION_KINETICA_1)"
+GUI OPTIONAL AUTHENTICATOR KINETICA_IN_NETWORK_AUTHENTICATION_KINETICA_1 CONTAINER%GROUP%CONTAINER_TITLE%"Network Authentication"%PROMPT_TYPE%NETWORK Network Authentication
+# ===========================================================================
+DEFAULT_MACRO KINETICA_IN_ATTRIBUTE_READING_KINETICA_1 ALL
+KINETICA_1_ATTRIBUTE_READING "$(KINETICA_IN_ATTRIBUTE_READING_KINETICA_1)"
+KINETICA_1_DATASET "$(SourceDataset_KINETICA_1)"
+#! END_SOURCE_HEADER
+#! START_WB_HEADER
+MACRO WB_KEYWORD "KINETICA_2"
+#! END_WB_HEADER
+#! START_DEST_HEADER KINETICA KINETICA_2
+#! END_DEST_HEADER
+#! START_WB_HEADER
+DEFAULT_MACRO DestDataset
+INCLUDE [ if {"$(DestDataset)" != ""} {                          \
+ puts {DEFAULT_MACRO DestDataset_KINETICA_2 $(DestDataset)}         \
+ } ]
+#! END_WB_HEADER
+#! START_DEST_HEADER KINETICA KINETICA_2
+DEFAULT_MACRO DestDataset_KINETICA_2 $(DestDataset_KINETICA)
+GUI DIRNAME DestDataset_KINETICA_2 Destination Kinetica Folder:
+DEFAULT_MACRO KINETICA_OUT_URL_KINETICA_2 http://172.30.195.3:9191
+KINETICA_2_URL "$(KINETICA_OUT_URL_KINETICA_2)"
+DEFAULT_MACRO KINETICA_OUT_COLLECTION_NAME_KINETICA_2 
+KINETICA_2_COLLECTION_NAME "$(KINETICA_OUT_COLLECTION_NAME_KINETICA_2)"
+DEFAULT_MACRO KINETICA_OUT_WRITE_GEOMETRY_KINETICA_2 NO
+KINETICA_2_WRITE_GEOMETRY "$(KINETICA_OUT_WRITE_GEOMETRY_KINETICA_2)"
+GUI ACTIVEDISCLOSUREGROUP KINETICA_OUT_WRITE_GEOMETRY_KINETICA_2 KINETICA_OUT_GEOMETRY_KEY Write Geometry
+DEFAULT_MACRO KINETICA_OUT_GEOMETRY_KEY_KINETICA_2 <Unused>
+KINETICA_2_GEOMETRY_KEY "$(KINETICA_OUT_GEOMETRY_KEY_KINETICA_2)"
+DEFAULT_MACRO KINETICA_OUT_WRITE_POINTS_KINETICA_2 NO
+KINETICA_2_WRITE_POINTS "$(KINETICA_OUT_WRITE_POINTS_KINETICA_2)"
+GUI ACTIVEDISCLOSUREGROUP KINETICA_OUT_WRITE_POINTS_KINETICA_2 KINETICA_OUT_POINT_X%KINETICA_OUT_POINT_Y Write Points
+DEFAULT_MACRO KINETICA_OUT_POINT_X_KINETICA_2 <Unused>
+KINETICA_2_POINT_X "$(KINETICA_OUT_POINT_X_KINETICA_2)"
+DEFAULT_MACRO KINETICA_OUT_POINT_Y_KINETICA_2 <Unused>
+KINETICA_2_POINT_Y "$(KINETICA_OUT_POINT_Y_KINETICA_2)"
+DEFAULT_MACRO KINETICA_OUT_USER_NAME_KINETICA_2 
+KINETICA_2_USER_NAME "$(KINETICA_OUT_USER_NAME_KINETICA_2)"
+GUI OPTIONAL TEXT KINETICA_OUT_USER_NAME_KINETICA_2 Username:
+DEFAULT_MACRO KINETICA_OUT_PASSWORD_KINETICA_2 
+KINETICA_2_PASSWORD "$(KINETICA_OUT_PASSWORD_KINETICA_2)"
+GUI OPTIONAL PASSWORD KINETICA_OUT_PASSWORD_KINETICA_2 Password:
+KINETICA_2_DATASET "$(DestDataset_KINETICA_2)"
+#! END_DEST_HEADER
+#! START_WB_HEADER
+#! END_WB_HEADER
+
+#! END_HEADER
+
+LOG_FILENAME "$(FME_HOME)pluginbuilder\gpudb-connector-fme\Tests\KineticaToKinetica.log"
+LOG_APPEND NO
+LOG_MAX_FEATURES 200
+LOG_MAX_RECORDED_FEATURES 200
+FME_REPROJECTION_ENGINE FME
+FME_IMPLICIT_CSMAP_REPROJECTION_MODE Auto
+FME_GEOMETRY_HANDLING Enhanced
+FME_STROKE_MAX_DEVIATION 0
+LOG_FILTER_MASK -1
+DEFAULT_MACRO DATASET_KEYWORD_KINETICA_1 KINETICA_1
+DEFAULT_MACRO DATASET_KEYWORD_KINETICA_2 KINETICA_2
+# -------------------------------------------------------------------------
+
+KINETICA_1_READER_META_ATTRIBUTES fme_feature_type
+
+# -------------------------------------------------------------------------
+
+MULTI_READER_CONTINUE_ON_READER_FAILURE No
+
+# -------------------------------------------------------------------------
+
+MACRO WORKSPACE_NAME KineticaToKinetica
+MACRO FME_VIEWER_APP fmedatainspector
+# -------------------------------------------------------------------------
+KINETICA_1_DEF KineticaFeatureType   y                            real64   x                            real64   TRACKID                      string   TIMESTAMP                    real64
+# -------------------------------------------------------------------------
+
+FACTORY_DEF * RoutingFactory   FACTORY_NAME "Router and Unexpected Input Remover"   COMMAND_PARM_EVALUATION SINGLE_PASS   MULTI_READER_KEYWORD KINETICA_1   INPUT FEATURE_TYPE *    ROUTE KINETICA KINETICA_1::KineticaFeatureType TO FME_GENERIC ::KineticaFeatureType ALIAS_GEOMETRY    MERGE_INPUT Yes   OUTPUT ROUTED FEATURE_TYPE *
+KINETICA_1_MERGE_DEF KINETICA_1::KineticaFeatureType EXACT KineticaFeatureType
+# -------------------------------------------------------------------------
+
+FACTORY_DEF * TeeFactory    FACTORY_NAME "KineticaFeatureType (KINETICA_1) Splitter"    INPUT FEATURE_TYPE KineticaFeatureType    OUTPUT FEATURE_TYPE KineticaFeatureType_KINETICA_1
+DEFAULT_MACRO WB_CURRENT_CONTEXT
+# -------------------------------------------------------------------------
+
+FACTORY_DEF * RoutingFactory FACTORY_NAME "Destination Feature Type Routing Correlator"   COMMAND_PARM_EVALUATION SINGLE_PASS   INPUT FEATURE_TYPE *    ROUTE FME_GENERIC KineticaFeatureType_KINETICA_1 TO KINETICA __GO_TO_FINAL_OUTPUT_ROUTER__ <at>CopyAttributes<openparen>ENCODED<comma>y<comma>x<comma>x<comma>y<closeparen>,multi_writer_id,0,<at>SupplyAttributes<openparen>ENCODED<comma>__wb_out_feat_type__<comma>KineticaFeatureType<closeparen> GEOMETRY   FEATURE_TYPE_ATTRIBUTE __wb_out_feat_type__   OUTPUT ROUTED FEATURE_TYPE *    OUTPUT NOT_ROUTED FEATURE_TYPE __nuke_me__ @Tcl2("FME_StatMessage 818059 [FME_GetAttribute fme_template_feature_type] 818060 818061 fme_warn")
+# -------------------------------------------------------------------------
+
+FACTORY_DEF * TeeFactory   FACTORY_NAME "Final Output Nuker"   INPUT FEATURE_TYPE __nuke_me__
+
+# -------------------------------------------------------------------------
+KINETICA_2_DEF KineticaFeatureType   y                            real64   x                            real64   TRACKID                      string   TIMESTAMP                    real64

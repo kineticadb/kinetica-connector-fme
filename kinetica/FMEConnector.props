@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <E_DRIVE>\\VBOXSVR\shared_folder</E_DRIVE>
+    <CPP_API_PATH>$(E_DRIVE)\gpudb-api-cpp</CPP_API_PATH>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="E_DRIVE">
+      <Value>$(E_DRIVE)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CPP_API_PATH">
+      <Value>$(CPP_API_PATH)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
