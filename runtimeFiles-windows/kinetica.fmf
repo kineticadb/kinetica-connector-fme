@@ -5,7 +5,7 @@
 ! Define the format name.
 ! --------------------------------------------------------------------------------
 DEFAULT_MACRO FORMAT_SHORT_NAME KINETICA
-SOURCE_READER KINETICA EXPOSED_ATTRS  "$($(FORMAT_SHORT_NAME)_EXPOSE_FORMAT_ATTRS)" -URL "$(URL)"  -TABLENAME "$(TABLENAME)" -USER_NAME "$(USER_NAME)" -PASSWORD "$(PASSWORD)" 
+SOURCE_READER KINETICA EXPOSED_ATTRS  "$($(FORMAT_SHORT_NAME)_EXPOSE_FORMAT_ATTRS)" -URL "$(URL)"  -TABLENAME "$(TABLENAME)" -USER_NAME "$(USER_NAME)" -PASSWORD "$(PASSWORD)"
 FORMAT_NAME   KINETICA
 FORMAT_TYPE DYNAMIC
 DYNAMIC_LIBRARY KINETICA
@@ -63,8 +63,8 @@ SOURCE_DATASET \"$[SourceDataset]\"
 ! Define the destination preamble.
 ! --------------------------------------------------------------------------------
 DESTINATION_PREAMBLE
-_
-GUI DIRNAME DestDataset Destination Kinetica Folder:
+__
+GUI STRING DestDataset Destination Table:
 __
 END_DESTINATION_PREAMBLE
 
@@ -76,52 +76,49 @@ DESTINATION_SETTINGS
 ! ------------------------------------------------------------------------------
 !INCLUDE destinationDatasetTypeValidation.fmi
 
-DEFAULT_VALUE URL $(URL)
--GUI TEXT URL URL:
+DEFAULT_VALUE URL "http://hostname:9191"
+GUI URL URL HTTP%HTTPS URL:
 __
 -DEFAULT_VALUE DATASET $(DATASET)
--GUI TEXT DATASET Table: 
+-GUI STRING DATASET Table:
 __
-
-DEFAULT_VALUE COLLECTION_NAME ""
--GUI OPTIONAL TEXT COLLECTION_NAME Collection: 
+DEFAULT_VALUE COLLECTION_NAME "FME"
+GUI OPTIONAL STRING COLLECTION_NAME Collection:
 __
 
 !--------------------------------------------------------------------
 ! PR43250: Allow users to omit geometry from the feature objects.
 !--------------------------------------------------------------------
-DEFAULT_VALUE WRITE_GEOMETRY Yes
+DEFAULT_VALUE WRITE_GEOMETRY No
 GUI ACTIVEDISCLOSUREGROUP WRITE_GEOMETRY GEOMETRY_KEY Write Geometry
 !--------------------------------------------------------------------
 ! Get the object key to write the geometry to
 !--------------------------------------------------------------------
 DEFAULT_VALUE GEOMETRY_KEY $(GEOMETRY_KEY)
--GUI TEXT GEOMETRY_KEY Geometry Field Name:
+GUI STRING GEOMETRY_KEY Geometry Field Name:
 
 
 !--------------------------------------------------------------------
 ! PR43250: Allow users to write points to x,y fields
 !--------------------------------------------------------------------
-DEFAULT_VALUE WRITE_POINTS Yes
+DEFAULT_VALUE WRITE_POINTS No
 GUI ACTIVEDISCLOSUREGROUP WRITE_POINTS POINT_X%POINT_Y Write Points
 !--------------------------------------------------------------------
 ! Get the object keys to write the point to
 !--------------------------------------------------------------------
 DEFAULT_VALUE POINT_X $(POINT_X)
--GUI TEXT POINT_X X Field Name:
+GUI STRING POINT_X X Field Name:
 
 DEFAULT_VALUE POINT_Y $(POINT_Y)
--GUI TEXT POINT_Y Y Field Name:
+GUI STRING POINT_Y Y Field Name:
 
 __
 DEFAULT_VALUE USER_NAME $(USER_NAME)
-GUI OPTIONAL TEXT USER_NAME Username:
+GUI OPTIONAL STRING USER_NAME Username:
 __
 DEFAULT_VALUE PASSWORD $(PASSWORD)
 GUI OPTIONAL PASSWORD PASSWORD Password:
 __
-
-
 END_DESTINATION_SETTINGS
 
 DESTINATION_DATASET \"$[DestDataset]\"
@@ -159,18 +156,18 @@ GEOM_MAP kinetica_arc             fme_arc                \
          fme_secondary_axis       fme_secondary_axis     \
          fme_rotation             fme_rotation           \
          fme_start_angle          fme_start_angle        \
-         fme_sweep_angle          fme_sweep_angle        
-         
+         fme_sweep_angle          fme_sweep_angle
+
 GEOM_MAP kinetica_text            fme_text               \
          fme_text_string          fme_text_string        \
          fme_text_size            fme_text_size          \
-         fme_rotation             fme_rotation           
+         fme_rotation             fme_rotation
 
 GEOM_MAP kinetica_multi_text      fme_text               \
          fme_text_string          fme_text_string        \
          fme_rotation             fme_rotation           \
-         fme_text_size            fme_text_size          
-         
+         fme_text_size            fme_text_size
+
 ! --------------------------------------------------------------------------------
 ! NOTE: If your format does not support ellipses, then fme_ellipse should
 ! be mapped to the same <format>_type to which fme_polygon has been
@@ -189,19 +186,19 @@ GEOM_MAP kinetica_ellipse         fme_ellipse            \
          fme_secondary_axis       fme_secondary_axis     \
          fme_rotation             fme_rotation
 
-         
-GEOM_MAP kinetica_polygon         fme_rectangle          
-         
-GEOM_MAP kinetica_polygon         fme_rounded_rectangle  
 
-GEOM_MAP kinetica_collection      fme_collection         
+GEOM_MAP kinetica_polygon         fme_rectangle
+
+GEOM_MAP kinetica_polygon         fme_rounded_rectangle
+
+GEOM_MAP kinetica_collection      fme_collection
 
 GEOM_MAP kinetica_surface         fme_surface
 
 GEOM_MAP kinetica_solid           fme_solid
 
-GEOM_MAP kinetica_null            fme_no_geom            
-         
+GEOM_MAP kinetica_null            fme_no_geom
+
 GEOM_MAP fme_no_map               fme_no_geom
 
 
@@ -209,9 +206,9 @@ GEOM_MAP fme_no_map               fme_no_geom
 ! Define the mappings of the attribute types.
 ! --------------------------------------------------------------------------------
  ATTR_TYPE_MAP                                                     \
-                string	                fme_varchar(width)         \
-                string	                fme_char(width)            \
-                string	                fme_binary(width)          \
+                string                  fme_varchar(width)         \
+                string                  fme_char(width)            \
+                string                  fme_binary(width)          \
                 string                  fme_buffer                 \
                 timestamp               fme_datetime               \
                 real64                  fme_real64                 \
@@ -220,14 +217,14 @@ GEOM_MAP fme_no_map               fme_no_geom
                 int16                   fme_int16                  \
                 int32                   fme_int32                  \
                 int64                   fme_int64                  \
-                decimal			fme_decimal(width,decimal) \
+                decimal                 fme_decimal(width,decimal) \
                 date                    fme_time                   \
                 time                    fme_date                   \
                 datetime                fme_datetime               \
                 IPv4                    fme_buffer                 \
-                WKT                     fme_buffer                 
-!                bytes                   fme_binarybuffer           
+                WKT                     fme_buffer
 
+!                bytes                   fme_binarybuffer
 !                uint8                   fme_uint8                  \
 !                uint16                  fme_uint16                 \
 !                uint32                  fme_uint32                 \
@@ -237,7 +234,7 @@ GEOM_MAP fme_no_map               fme_no_geom
 !                string                  fme_xml                    \
 !                string                  fme_json                   \
 !                logical                 fme_boolean                \
-!                real64				    fme_decimal(width,decimal) \
+!                real64                 fme_decimal(width,decimal) \
 
 
 ! --------------------------------------------------------------------------------
@@ -273,7 +270,7 @@ INCLUDE [if { ("$(FMEGEN_DIRECTION)" == "Source") } { \
             append line { SEARCH_ENVELOPE_COORDINATE_SYSTEM}; \
             puts $line; \
          } ]
-         
+
 ! ------------------------------------------------------------------------------
 ! Setting the INVALID characters which cannot be used for file names
 ! \ / " : ? * < > | are the invalid characters for windows file system
