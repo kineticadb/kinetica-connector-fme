@@ -36,15 +36,63 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 #include "fmestring.h"
+
 #include <string>
 #include <stdio.h>
 #include <sstream>
 #include <vector>
 
+// FME Plug-in SDK includes
+#include <fmetypes.h>
+
 using namespace std;
 
 class IFMELogFile;
 class IFMEMappingFile;
+
+
+
+//------------------------------------------------------------------------------
+// Useful Logging Macros
+// ----------------------
+// Create an inline std::stringstream stream object and return the
+// std::string from it.
+// E.g. std::string msg( KINETICA_STREAM_TO_STRING( "Hello " << user_name << ", how are you?" ) );
+// Note: Extra cast needed for gcc 4.8.7 (at least).
+#define KINETICA_STREAM_TO_STRING(...) ( static_cast<const std::ostringstream&> (std::ostringstream() << __VA_ARGS__).str() )
+
+// Create an inline std::stringstream stream object and return the
+// char array from it.
+// E.g. std::string msg( KINETICA_STREAM_TO_STRING( "Hello " << user_name << ", how are you?" ) );
+#define KINETICA_STREAM_TO_CSTRING(...) ( KINETICA_STREAM_TO_STRING(__VA_ARGS__).c_str() )
+
+// Log a informational message
+#define LOG_KINETICA_INFO(logger, ...) ( logger->logMessageString( KINETICA_STREAM_TO_STRING( "Kinetica: " << __VA_ARGS__).c_str() ) )
+
+// Log a warning 
+#define LOG_KINETICA_WARN(logger, ...) ( logger->logMessageString( KINETICA_STREAM_TO_STRING( "Kinetica Warning: " << __VA_ARGS__).c_str(), \
+                                         FME_WARN ) )
+
+// Log an error
+#define LOG_KINETICA_ERROR(logger, ...) ( logger->logMessageString( KINETICA_STREAM_TO_STRING( "Kinetica Error: " << __VA_ARGS__).c_str(), \
+                                         FME_ERROR ) )
+#define LOG_KINETICA_READER_ERROR(logger, ...) ( logger->logMessageString( KINETICA_STREAM_TO_STRING( "Kinetica Reader Error: " << __VA_ARGS__).c_str(), \
+                                         FME_ERROR ) )
+#define LOG_KINETICA_WRITER_ERROR(logger, ...) ( logger->logMessageString( KINETICA_STREAM_TO_STRING( "Kinetica Writer Error: " << __VA_ARGS__).c_str(), \
+                                         FME_ERROR ) )
+
+// Get the proper ordinal word (0th, 1st, 2nd, 3rd, 4th, ...)
+#define KINETICA_GET_ORDINAL_NUMBER(number) ( (number == 1) ? "1st" :  \
+                                              ((number == 2) ? "2nd" : \
+                                               (number == 3) ? "3rd" : \
+                                                KINETICA_STREAM_TO_CSTRING( number << "th" ) ) )
+
+
+
+//------------------------------------------------------------------------------
+// Some string constants
+const std::string KINETICA_PROPERTY_NOT_NULLABLE = "not_nullable";
+const std::string KINETICA_PROPERTY_PRIMARY_KEY  = "primary_key";
 
 //------------------------------------------------------------------------------
 // Trim whitespace off the ends of a string
@@ -136,5 +184,28 @@ FME_Status convertToInt(const char* str, T& num)
 }
 
 std::vector<string> split(const string &s, char delim);
+
+//------------------------------------------------------------------------------
+// Date, datetime, and timestamp related utility functions.
+
+/*
+ * For a given date value, check if the value is out of the allowed
+ * range of years ([1000, 2900]); if so, change it to the minimum/maximum value.
+ */
+void fixOutOfBoundsDate( IFMELogFile* logger, char* dt_value );
+
+/*
+ * For a given datetime value, check if the value is out of the allowed
+ * range of years ([1000, 2900]); if so, change it to the minimum/maximum value.
+ */
+void fixOutOfBoundsDatetime( IFMELogFile* logger, char* dt_value );
+
+/*
+* For a given timestamp (long) value, check if the value is out of the allowed
+* range of [-30610224000000, 29379542399999]; if so, change it to the
+* minimum/maximum value.  Return the corrected value (or the unchanged value).
+*/
+std::string fixOutOfBoundsTimestamp( IFMELogFile* logger,
+                                     const std::string& timestamp_value );
 
 #endif

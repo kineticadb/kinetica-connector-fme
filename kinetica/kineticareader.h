@@ -138,10 +138,10 @@ private:
 	string									gKineticaGeometryField;
 	vector<string>							gSchemaColumnNames;
 	vector<gpudb::Type::Column::ColumnType> gSchemaColumnTypes;
-	int										gNumRead = 0;
-	int										gIndexInBlock = 0;
-	int										gOffset  = 0;
-	int										gBlockSize;
+	size_t                                  gNumRead = 0;
+	size_t                                  gIndexInBlock = 0;
+	size_t                                  gOffset  = 0;
+	size_t                                  gBlockSize;
 	size_t                                  g_num_records_in_batch;
     bool                                    g_table_has_more_records;
 	gpudb::GetRecordsResponse<gpudb::GenericRecord> gRecordsResponse;

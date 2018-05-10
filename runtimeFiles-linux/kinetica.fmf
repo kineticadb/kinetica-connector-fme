@@ -63,8 +63,8 @@ SOURCE_DATASET \"$[SourceDataset]\"
 ! Define the destination preamble.
 ! --------------------------------------------------------------------------------
 DESTINATION_PREAMBLE
-_
-GUI DIRNAME DestDataset Kinetica Table:
+__
+GUI STRING DestDataset Destination Table:
 __
 END_DESTINATION_PREAMBLE
 
@@ -76,52 +76,49 @@ DESTINATION_SETTINGS
 ! ------------------------------------------------------------------------------
 !INCLUDE destinationDatasetTypeValidation.fmi
 
-DEFAULT_VALUE URL $(URL)
--GUI TEXT URL URL:
+DEFAULT_VALUE URL "http://hostname:9191"
+GUI URL URL HTTP%HTTPS URL:
 __
 -DEFAULT_VALUE DATASET $(DATASET)
--GUI TEXT DATASET Table:
+-GUI STRING DATASET Table:
 __
-
-DEFAULT_VALUE COLLECTION_NAME ""
--GUI OPTIONAL TEXT COLLECTION_NAME Collection:
+DEFAULT_VALUE COLLECTION_NAME "FME"
+GUI OPTIONAL STRING COLLECTION_NAME Collection:
 __
 
 !--------------------------------------------------------------------
 ! PR43250: Allow users to omit geometry from the feature objects.
 !--------------------------------------------------------------------
-DEFAULT_VALUE WRITE_GEOMETRY Yes
+DEFAULT_VALUE WRITE_GEOMETRY No
 GUI ACTIVEDISCLOSUREGROUP WRITE_GEOMETRY GEOMETRY_KEY Write Geometry
 !--------------------------------------------------------------------
 ! Get the object key to write the geometry to
 !--------------------------------------------------------------------
 DEFAULT_VALUE GEOMETRY_KEY $(GEOMETRY_KEY)
--GUI TEXT GEOMETRY_KEY Geometry Field Name:
+GUI STRING GEOMETRY_KEY Geometry Field Name:
 
 
 !--------------------------------------------------------------------
 ! PR43250: Allow users to write points to x,y fields
 !--------------------------------------------------------------------
-DEFAULT_VALUE WRITE_POINTS Yes
+DEFAULT_VALUE WRITE_POINTS No
 GUI ACTIVEDISCLOSUREGROUP WRITE_POINTS POINT_X%POINT_Y Write Points
 !--------------------------------------------------------------------
 ! Get the object keys to write the point to
 !--------------------------------------------------------------------
 DEFAULT_VALUE POINT_X $(POINT_X)
--GUI TEXT POINT_X X Field Name:
+GUI STRING POINT_X X Field Name:
 
 DEFAULT_VALUE POINT_Y $(POINT_Y)
--GUI TEXT POINT_Y Y Field Name:
+GUI STRING POINT_Y Y Field Name:
 
 __
 DEFAULT_VALUE USER_NAME $(USER_NAME)
-GUI OPTIONAL TEXT USER_NAME Username:
+GUI OPTIONAL STRING USER_NAME Username:
 __
 DEFAULT_VALUE PASSWORD $(PASSWORD)
 GUI OPTIONAL PASSWORD PASSWORD Password:
 __
-
-
 END_DESTINATION_SETTINGS
 
 DESTINATION_DATASET \"$[DestDataset]\"
@@ -209,19 +206,33 @@ GEOM_MAP fme_no_map               fme_no_geom
 ! Define the mappings of the attribute types.
 ! --------------------------------------------------------------------------------
  ATTR_TYPE_MAP                                                     \
-                string		            fme_varchar(width)         \
-                string		            fme_char(width)            \
-                string		            fme_binary(width)          \
+                string	                fme_char(width)            \
+                string	                fme_varchar(width)         \
+                string	                fme_binary(width)          \
                 string                  fme_buffer                 \
-                datetime                fme_datetime               \
+                char1                   fme_varchar(width)         \
+                char2                   fme_varchar(width)         \
+                char4                   fme_varchar(width)         \
+                char8                   fme_varchar(width)         \
+                char16                  fme_varchar(width)         \
+                char32                  fme_varchar(width)         \
+                char64                  fme_varchar(width)         \
+                char128                 fme_varchar(width)         \
+                char256                 fme_varchar(width)         \
                 real64                  fme_real64                 \
                 real32                  fme_real32                 \
-                char                    fme_int8                   \
+                int8                    fme_int8                   \
                 int16                   fme_int16                  \
                 int32                   fme_int32                  \
                 int64                   fme_int64                  \
-                real64				    fme_decimal(width,decimal)
-
+                timestamp               fme_int64                  \
+                decimal                 fme_decimal(width,decimal) \
+                date                    fme_date                   \
+                time                    fme_time                   \
+                datetime                fme_datetime               \
+                WKT                     fme_buffer                 \
+                IPv4                    fme_varchar(width)
+!                bytes                   fme_binarybuffer
 !                uint8                   fme_uint8                  \
 !                uint16                  fme_uint16                 \
 !                uint32                  fme_uint32                 \
@@ -231,9 +242,7 @@ GEOM_MAP fme_no_map               fme_no_geom
 !                string                  fme_xml                    \
 !                string                  fme_json                   \
 !                logical                 fme_boolean                \
-!                datetime                fme_time                   \
-!                datetime                fme_date                   \
-!                real64				    fme_decimal(width,decimal) \
+!                real64                 fme_decimal(width,decimal) \
 
 
 ! --------------------------------------------------------------------------------
@@ -283,7 +292,7 @@ FEATURE_TYPE_INVALID_CHARS "$(_InvalidCharacters)"
 ! ----------------------------------------------------------------------
 ! The attribute index types, for Workbench
 !WORKBENCH_ATTR_INDEX_TYPES PRIMARYKEY NULLABLE CHAR1 CHAR2 CHAR4 CHAR8 CHAR16 CHAR32 CHAR64 CHAR128 CHAR256 IPV4 disk_optimized store_only text_search
-WORKBENCH_ATTR_INDEX_TYPES primary_key disk_optimized store_only text_search
+WORKBENCH_ATTR_INDEX_TYPES primary_key shard_key nullable disk_optimized store_only text_search
 
 FORMAT_PARAMETER DATASET_NAME Database
 FORMAT_PARAMETER FEATURE_TYPE_NAME Table

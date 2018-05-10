@@ -64,10 +64,10 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\runtimeFiles-windows\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\runtimeFiles-windows\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\runtimeFiles-windows\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\runtimeFiles-windows\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)runtimeFiles-windows\$(PlatformTarget)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)runtimeFiles-windows\$(PlatformTarget)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)runtimeFiles-windows\$(PlatformTarget)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)runtimeFiles-windows\$(PlatformTarget)\</OutDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">kinetica</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">kinetica</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">kinetica</TargetName>
@@ -76,6 +76,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\IEUser\Documents\gpudb-api-cpp\thirdparty\avro-cpp-1.7.7;C:\Users\IEUser\Documents\gpudb-api-cpp\thirdparty\boost_1_65_1;C:\gisfederal-gpudb-api-cpp;c:\program files\fme\pluginbuilder\cpp;c:\program files\fme\fmeobjects\cpp;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\IEUser\Documents\gpudb-api-cpp\project\gpudbapidll\Win32\Debug;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;C:\Users\IEUser\Documents\gpudb-api-cpp\project\gpudbapidll\Win32\Debug</LibraryPath>
@@ -85,9 +86,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(CPP_API_PATH)\thirdparty\avro-cpp-1.7.7;$(CPP_API_PATH)\thirdparty\boost_1_65_1;$(CPP_API_PATH);$(SolutionDir)\..\..\fmeobjects\cpp;$(SolutionDir)\..\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(CPP_API_PATH)thirdparty\avro-cpp-1.7.7;$(CPP_API_PATH)thirdparty\boost_1_65_1;$(CPP_API_PATH);C:\Users\Meem Mahmud\Work\gpudb-api-cpp\thirdparty\boost_1_65_1;C:\Users\Meem Mahmud\Work\gpudb-api-cpp\thirdparty\avro-cpp-1.7.7;$(SolutionDir)\..\..\fmeobjects\cpp;$(SolutionDir)\..\cpp;%(AdditionalIncludeDirectories);C:\Users\Meem Mahmud\Work\gpudb-api-cpp\;C:\Users\Meem Mahmud\Work\gpudb-api-cpp</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_DEBUG;_WINDOWS;GPUDB_NO_HTTPS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -99,7 +103,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\runtimeFiles-windows\;$(CPP_API_PATH)\thirdparty\avro-cpp-1.7.7\$(PlatformName)\$(Configuration);$(CPP_API_PATH)\project\gpudbapidll\$(PlatformName)\$(Configuration);$(CPP_API_PATH)\thirdparty\boost_1_65_1\lib$(PlatformArchitecture)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(CPP_API_PATH)project\gpudbapidll\$(PlatformName)\$(Configuration);$(SolutionDir)runtimeFiles-windows\$(PlatformName);$(CPP_API_PATH)thirdparty\avro-cpp-1.7.7\$(PlatformName)\$(Configuration);$(CPP_API_PATH)thirdparty\boost_1_65_1\lib$(PlatformArchitecture)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>gpudbapilib.lib;avrocpp_s.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
@@ -109,8 +113,8 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(CPP_API_PATH)\thirdparty\avro-cpp-1.7.7;$(CPP_API_PATH)\thirdparty\boost_1_65_1;$(CPP_API_PATH);$(SolutionDir)\..\..\fmeobjects\cpp;$(SolutionDir)\..\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_DEBUG;_WINDOWS;GPUDB_NO_HTTPS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(CPP_API_PATH)thirdparty\avro-cpp-1.7.7;$(CPP_API_PATH)thirdparty\boost_1_65_1;$(CPP_API_PATH);C:\Users\Meem Mahmud\Work\gpudb-api-cpp\thirdparty\boost_1_65_1;C:\Users\Meem Mahmud\Work\gpudb-api-cpp\thirdparty\avro-cpp-1.7.7;C:\Users\Meem Mahmud\Work\gpudb-api-cpp\boost_1_65_1;C:\Users\Meem Mahmud\Work\gpudb-api-cpp\avro-cpp-1.7.7;C:\Users\Meem Mahmud\Work\gpudb-api-cpp;$(SolutionDir)..\..\fmeobjects\cpp;$(SolutionDir)..\cpp;%(AdditionalIncludeDirectories);C:\Users\Meem Mahmud\Work\gpudb-api-cpp\;C:\Users\Meem Mahmud\Work\gpudb-api-cpp</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_DEBUG;_WINDOWS;GPUDB_NO_HTTPS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>Disabled</Optimization>
@@ -121,13 +125,13 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\runtimeFiles-windows\;$(CPP_API_PATH)\thirdparty\avro-cpp-1.7.7\$(PlatformName)\$(Configuration);$(CPP_API_PATH)\project\gpudbapidll\$(PlatformName)\$(Configuration);$(CPP_API_PATH)\thirdparty\boost_1_65_1\lib$(PlatformArchitecture)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>gpudbapilib.lib;avrocpp_s.lib;avrocpp_s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(CPP_API_PATH)project\gpudbapidll\$(PlatformName)\$(Configuration);$(SolutionDir)runtimeFiles-windows\$(PlatformName);$(CPP_API_PATH)thirdparty\avro-cpp-1.7.7\$(PlatformName)\$(Configuration);$(CPP_API_PATH)thirdparty\boost_1_65_1\lib$(PlatformArchitecture)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>gpudbapilib.lib;avrocpp_s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(CPP_API_PATH)\thirdparty\avro-cpp-1.7.7;$(CPP_API_PATH)\thirdparty\boost_1_65_1;$(CPP_API_PATH);$(SolutionDir)\..\..\fmeobjects\cpp;$(SolutionDir)\..\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(CPP_API_PATH)thirdparty\avro-cpp-1.7.7;$(CPP_API_PATH)thirdparty\boost_1_65_1;$(CPP_API_PATH);C:\Users\Meem Mahmud\Work\gpudb-api-cpp\thirdparty\boost_1_65_1;C:\Users\Meem Mahmud\Work\gpudb-api-cpp\thirdparty\avro-cpp-1.7.7;$(SolutionDir)\..\..\fmeobjects\cpp;$(SolutionDir)\..\cpp;%(AdditionalIncludeDirectories);C:\Users\Meem Mahmud\Work\gpudb-api-cpp\;C:\Users\Meem Mahmud\Work\gpudb-api-cpp</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;GPUDB_NO_HTTPS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
@@ -143,7 +147,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <AdditionalDependencies>gpudbapilib.lib;avrocpp_s.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\runtimeFiles-windows\;$(CPP_API_PATH)\thirdparty\avro-cpp-1.7.7\$(PlatformName)\$(Configuration);$(CPP_API_PATH)\project\gpudbapidll\$(PlatformName)\$(Configuration);$(CPP_API_PATH)\thirdparty\boost_1_65_1\lib$(PlatformArchitecture)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(CPP_API_PATH)project\gpudbapidll\$(PlatformName)\$(Configuration);$(SolutionDir)runtimeFiles-windows\$(PlatformName);$(CPP_API_PATH)thirdparty\avro-cpp-1.7.7\$(PlatformName)\$(Configuration);$(CPP_API_PATH)thirdparty\boost_1_65_1\lib$(PlatformArchitecture)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,7 +155,7 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(CPP_API_PATH)\thirdparty\avro-cpp-1.7.7;$(CPP_API_PATH)\thirdparty\boost_1_65_1;$(CPP_API_PATH);$(SolutionDir)\..\..\fmeobjects\cpp;$(SolutionDir)\..\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(CPP_API_PATH)thirdparty\avro-cpp-1.7.7;$(CPP_API_PATH)thirdparty\boost_1_65_1;$(CPP_API_PATH);C:\Users\Meem Mahmud\Work\gpudb-api-cpp\thirdparty\boost_1_65_1;C:\Users\Meem Mahmud\Work\gpudb-api-cpp\thirdparty\avro-cpp-1.7.7;$(SolutionDir)\..\..\fmeobjects\cpp;$(SolutionDir)\..\cpp;%(AdditionalIncludeDirectories);C:\Users\Meem Mahmud\Work\gpudb-api-cpp\;C:\Users\Meem Mahmud\Work\gpudb-api-cpp</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;GPUDB_NO_HTTPS;%(PreprocessorDefinitions);GPUDB_NO_HTTPS</PreprocessorDefinitions>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -168,7 +172,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <AdditionalLibraryDirectories>$(SolutionDir)\runtimeFiles-windows\;$(CPP_API_PATH)\thirdparty\avro-cpp-1.7.7\$(PlatformName)\$(Configuration);$(CPP_API_PATH)\project\gpudbapidll\$(PlatformName)\$(Configuration);$(CPP_API_PATH)\thirdparty\boost_1_65_1\lib$(PlatformArchitecture)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(CPP_API_PATH)project\gpudbapidll\$(PlatformName)\$(Configuration);$(SolutionDir)runtimeFiles-windows\$(PlatformName);$(CPP_API_PATH)thirdparty\avro-cpp-1.7.7\$(PlatformName)\$(Configuration);$(CPP_API_PATH)thirdparty\boost_1_65_1\lib$(PlatformArchitecture)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>gpudbapilib.lib;avrocpp_s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>

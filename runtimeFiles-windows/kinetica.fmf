@@ -206,24 +206,32 @@ GEOM_MAP fme_no_map               fme_no_geom
 ! Define the mappings of the attribute types.
 ! --------------------------------------------------------------------------------
  ATTR_TYPE_MAP                                                     \
-                string                  fme_varchar(width)         \
-                string                  fme_char(width)            \
-                string                  fme_binary(width)          \
+                string	                fme_char(width)            \
+                string	                fme_varchar(width)         \
+                string	                fme_binary(width)          \
                 string                  fme_buffer                 \
-                timestamp               fme_datetime               \
+                char1                   fme_varchar(width)         \
+                char2                   fme_varchar(width)         \
+                char4                   fme_varchar(width)         \
+                char8                   fme_varchar(width)         \
+                char16                  fme_varchar(width)         \
+                char32                  fme_varchar(width)         \
+                char64                  fme_varchar(width)         \
+                char128                 fme_varchar(width)         \
+                char256                 fme_varchar(width)         \
                 real64                  fme_real64                 \
                 real32                  fme_real32                 \
                 int8                    fme_int8                   \
                 int16                   fme_int16                  \
                 int32                   fme_int32                  \
                 int64                   fme_int64                  \
+                timestamp               fme_int64                  \
                 decimal                 fme_decimal(width,decimal) \
-                date                    fme_time                   \
-                time                    fme_date                   \
+                date                    fme_date                   \
+                time                    fme_time                   \
                 datetime                fme_datetime               \
-                IPv4                    fme_buffer                 \
-                WKT                     fme_buffer
-
+                WKT                     fme_buffer                 \
+                IPv4                    fme_varchar(width)
 !                bytes                   fme_binarybuffer
 !                uint8                   fme_uint8                  \
 !                uint16                  fme_uint16                 \
@@ -284,7 +292,7 @@ FEATURE_TYPE_INVALID_CHARS "$(_InvalidCharacters)"
 ! ----------------------------------------------------------------------
 ! The attribute index types, for Workbench
 !WORKBENCH_ATTR_INDEX_TYPES PRIMARYKEY NULLABLE CHAR1 CHAR2 CHAR4 CHAR8 CHAR16 CHAR32 CHAR64 CHAR128 CHAR256 IPV4 disk_optimized store_only text_search
-WORKBENCH_ATTR_INDEX_TYPES primary_key nullable disk_optimized store_only text_search
+WORKBENCH_ATTR_INDEX_TYPES primary_key shard_key not_nullable disk_optimized store_only text_search
 
 FORMAT_PARAMETER DATASET_NAME Database
 FORMAT_PARAMETER FEATURE_TYPE_NAME Table

@@ -77,7 +77,7 @@ FME_Status getConnectionInfo(IFMEMappingFile* gMappingFile, IFMELogFile* gLogFil
 	{
 		// No mapping found.
 		connectionInfo->append("");
-		gLogFile->logMessageString("No URL was entered.");
+        LOG_KINETICA_INFO( gLogFile, "No URL was entered." );
 	}
 
 	if (gMappingFile->fetchWithPrefix(keyword.c_str(), typeName.c_str(), kDataSet, *value))
@@ -89,7 +89,6 @@ FME_Status getConnectionInfo(IFMEMappingFile* gMappingFile, IFMELogFile* gLogFil
 	{
 		// No mapping found.
 		connectionInfo->append("");
-		// gLogFile->logMessageString("No kDataSet was entered.");
 	}
 
 
@@ -102,7 +101,6 @@ FME_Status getConnectionInfo(IFMEMappingFile* gMappingFile, IFMELogFile* gLogFil
 	{
 		// No mapping found.
 		connectionInfo->append("");
-		// gLogFile->logMessageString("No kTableName was entered.");
 	}
 
 
@@ -138,7 +136,6 @@ FME_Status getConnectionInfo(IFMEMappingFile* gMappingFile, IFMELogFile* gLogFil
 	{
 		// No mapping found.
 		connectionInfo->append("");
-		// gLogFile->logMessageString("No username was entered.");
 	}
 
 	if (gMappingFile->fetchWithPrefix(keyword.c_str(), typeName.c_str(), kPassword, *value))
@@ -150,7 +147,6 @@ FME_Status getConnectionInfo(IFMEMappingFile* gMappingFile, IFMELogFile* gLogFil
 	{
 		// No mapping found.
 		connectionInfo->append("");
-		// gLogFile->logMessageString("No password was entered.");
 	}
 
 	if (gMappingFile->fetchWithPrefix(keyword.c_str(), typeName.c_str(), kPointX, *value))
@@ -198,13 +194,13 @@ void getWriterMode(IFMEMappingFile* gMappingFile, IFMELogFile* gLogFile, string 
 	// Attempt to grab the writer mode from the mapping file
 	if (gMappingFile->fetchWithPrefix(keyword.c_str(), typeName.c_str(), kWriterMode, *value))
 	{
-		// Mapping has been found, log the data.
-		gLogFile->logMessageString(value->data(), FME_WARN);
+		// Mapping has been found, log the data
+        LOG_KINETICA_WARN( gLogFile, value->data() );
 	}
 	else
 	{
-		// No mapping found.
-		gLogFile->logMessageString("No writer mode found.");
+		// No mapping found
+        LOG_KINETICA_WARN( gLogFile, "No writer mode found.");
 	}
 }
 
@@ -219,25 +215,25 @@ void getTransactionSettings(IFMEMappingFile* gMappingFile, IFMELogFile* gLogFile
 	// Attempt to grab the writer mode from the mapping file
 	if (gMappingFile->fetchWithPrefix(keyword.c_str(), typeName.c_str(), kStartTransaction, *value))
 	{
-		// Mapping has been found, log the data.
-		gLogFile->logMessageString(value->data(), FME_WARN);
+		// Mapping has been found, log the data
+        LOG_KINETICA_WARN( gLogFile, value->data() );
 	}
 	else
 	{
 		// No mapping found.
-		gLogFile->logMessageString("No start transaction was found.");
+        LOG_KINETICA_INFO( gLogFile, "No start transaction was found.");
 	}
 
 	// Attempt to grab the writer mode from the mapping file
 	if (gMappingFile->fetchWithPrefix(keyword.c_str(), typeName.c_str(), kTransactionInterval, *value))
 	{
-		// Mapping has been found, log the data.
-		gLogFile->logMessageString(value->data(), FME_WARN);
+		// Mapping has been found, log the data
+        LOG_KINETICA_WARN( gLogFile, value->data() );
 	}
 	else
 	{
-		// No mapping found.
-		gLogFile->logMessageString("No transaction interval was found.");
+		// No mapping found
+        LOG_KINETICA_INFO( gLogFile, "No transaction interval was found." );
 	}
 }
 
@@ -503,7 +499,8 @@ FME_Boolean isStringEqualZero(const char* str)
 
 //===========================================================================
 //
-std::vector<string> split(const string &s, char delim) {
+std::vector<string> split(const string &s, char delim)
+{
 	stringstream ss(s);
 	string item;
 	std::vector<string> tokens;
@@ -512,3 +509,116 @@ std::vector<string> split(const string &s, char delim) {
 	}
 	return tokens;
 }
+
+
+//=============================================================================
+// Date, datetime, and timestamp related utility functions
+static const std::string KINETICA_MIN_YEAR  = std::string( "1000" );
+static const std::string KINETICA_MAX_YEAR  = std::string( "2900" );
+static const char* KINETICA_MIN_DATE = "1000-01-01";
+static const char* KINETICA_MAX_DATE = "2900-12-31";
+static const char* KINETICA_MIN_DATETIME = "1000-01-01 00:00:00.000";
+static const char* KINETICA_MAX_DATETIME = "2900-12-31 23:59:59.999";
+static const size_t KINETICA_DATE_LEN = 10;
+static const size_t KINETICA_DATETIME_LEN = 23;
+static const std::string KINETICA_MIN_TIMESTAMP  = std::string( "-30610224000000" );
+static const std::string KINETICA_MAX_TIMESTAMP  = std::string( "29379542399999" );
+static const size_t KINETICA_MIN_TIMESTAMP_LEN   = KINETICA_MIN_TIMESTAMP.size();
+static const size_t KINETICA_MAX_TIMESTAMP_LEN   = KINETICA_MAX_TIMESTAMP.size();
+
+/*
+ * For a given date value, check if the value is out of the allowed
+ * range of years ([1000, 2900]); if so, change it to the minimum/maximum value.
+ */
+void fixOutOfBoundsDate( IFMELogFile* logger, char* dt_value )
+{
+    // Check for the year being out of range [1000, 2900]
+    // Minimum boundary
+    if (KINETICA_MIN_YEAR.compare(0, 4, dt_value, 4) > 0)
+    {   // The given year is < 1000
+        // Log a warning
+        LOG_KINETICA_WARN( logger,
+            "Year in given value '" << dt_value
+            << "' is less than '1000'; converting value to '"
+            << KINETICA_MIN_DATE << "'" );
+        // Convert the year to Kinetica's minimum date
+        memcpy( dt_value, KINETICA_MIN_DATE, KINETICA_DATE_LEN );
+    }
+    else if (KINETICA_MAX_YEAR.compare(0, 4, dt_value, 4) < 0)
+    {   // The given year is > 2900
+        // Log a warning
+        LOG_KINETICA_WARN( logger,
+            "Year in given value '" << dt_value
+            << "' is more than '2900'; converting value to '"
+            << KINETICA_MAX_DATE << "'" );
+        // Convert the year to Kinetica's maximum date
+        memcpy( dt_value, KINETICA_MAX_DATE, KINETICA_DATE_LEN );
+    }
+}  // end fixOutOfBoundsDate
+
+
+/*
+ * For a given datetime value, check if the value is out of the allowed
+ * range of years ([1000, 2900]); if so, change it to the minimum/maximum value.
+ */
+void fixOutOfBoundsDatetime( IFMELogFile* logger, char* dt_value )
+{
+    // Check for the year being out of range [1000, 2900]
+    // Minimum boundary
+    if (KINETICA_MIN_YEAR.compare(0, 4, dt_value, 4) > 0)
+    {   // The given year is < 1000
+        // Log a warning
+        LOG_KINETICA_WARN( logger,
+            "Year in given value '" << dt_value
+            << "' is less than '1000'; converting value to '"
+            << KINETICA_MIN_DATETIME << "'" );
+        // Convert the year to Kinetica's minimum datetime
+        memcpy( dt_value, KINETICA_MIN_DATETIME, KINETICA_DATETIME_LEN );
+    }
+    else if (KINETICA_MAX_YEAR.compare(0, 4, dt_value, 4) < 0)
+    {   // The given year is > 2900
+        // Log a warning
+        LOG_KINETICA_WARN( logger,
+            "Year in given value '" << dt_value
+            << "' is more than '2900'; converting value to '"
+            << KINETICA_MAX_DATETIME << "'" );
+        // Convert the year to Kinetica's maximum datetime
+        memcpy( dt_value, KINETICA_MAX_DATETIME, KINETICA_DATETIME_LEN );
+    }
+}  // end fixOutOfBoundsDateTime
+
+/*
+* For a given timestamp (long) value, check if the value is out of the allowed
+* range of [-30610224000000, 29379542399999]; if so, change it to the
+* minimum/maximum value.  
+*/
+std::string fixOutOfBoundsTimestamp( IFMELogFile* logger, const std::string& timestamp_value )
+{
+    // Check for the timestamp being out of range.
+    // Minimum boundary (only for negative values)
+    if ( timestamp_value[ 0 ] == '-' )
+    {   // Doing the minimum boundary check only makes sense for negative values
+        if (KINETICA_MIN_TIMESTAMP.compare( 0, KINETICA_MIN_TIMESTAMP_LEN, timestamp_value ) < 0)
+        {   // The given timestamp is less than the minimum
+            // Log a warning
+            LOG_KINETICA_WARN( logger,
+                "Given timestamp value '" << timestamp_value
+                << "' is less than the allowed minimum; converting to '"
+                << KINETICA_MIN_TIMESTAMP << "'" );
+            // Convert to Kinetica's minimum timestamp values
+            return KINETICA_MIN_TIMESTAMP;
+        }
+    }
+    else if (KINETICA_MAX_TIMESTAMP.compare( 0, KINETICA_MIN_TIMESTAMP_LEN, timestamp_value ) < 0)
+    {   // The given timestamp exceeds the maximum
+        // Log a warning
+        LOG_KINETICA_WARN( logger,
+            "Given timestamp value '" << timestamp_value
+            << "' is greater than the allowed maximum; converting to '"
+            << KINETICA_MAX_TIMESTAMP << "'" );
+        // Convert to Kinetica's maximum timestamp values
+        return KINETICA_MAX_TIMESTAMP;
+    }
+    // All is well, return the original value
+    return timestamp_value;
+}  // end fixOutOfBoundsTimestamp

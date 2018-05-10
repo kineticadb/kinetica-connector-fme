@@ -98,7 +98,7 @@ FME_Status KineticaReader::open(const char* datasetName, const IFMEStringArray& 
    // -----------------------------------------------------------------------
 
    // Log an opening reader message
-   gLogFile->logMessageString((kMsgOpeningReader + dataset_).c_str());
+   LOG_KINETICA_INFO( gLogFile, kMsgOpeningReader << dataset_ );
 
    FMEStringArray connectionInfo;
    getConnectionInfo(gMappingFile, gLogFile, connectionInfo, readerKeyword_, readerTypeName_);
@@ -106,8 +106,7 @@ FME_Status KineticaReader::open(const char* datasetName, const IFMEStringArray& 
    // -----------------------------------------------------------------------
    // Open the dataset here, e.g. inputFile.open(dataSetName, ios::in);
    // -----------------------------------------------------------------------
-
-   gLogFile->logMessageString(gKineticaURL.c_str());
+   LOG_KINETICA_INFO( gLogFile, gKineticaURL );
    // Read the mapping file parameters if there is one specified.
 
    gKineticaURL        = trim(connectionInfo->elementAt(0)->data());
@@ -116,31 +115,34 @@ FME_Status KineticaReader::open(const char* datasetName, const IFMEStringArray& 
 
    try
    {
-       std::cout << "Opening reader to table '" << gKineticaTableName << "' on Kinetica database at " << gKineticaURL << std::endl;
+       LOG_KINETICA_INFO( gLogFile, "Opening reader to table '" << gKineticaTableName << "' on Kinetica database at " << gKineticaURL );
        gKineticaConnection = new gpudb::GPUdb( gKineticaURL );
+
+       // Get the table's record type information
+       std::map<std::string, std::string> options;
+       gpudb::ShowTableResponse showTableResp = gKineticaConnection->showTable(gKineticaTableName, options);
+       if (gSchemaColumnNames.size() == 0)
+       {
+	       // Don't forget to release the resource!
+	       gTypeSchema = new gpudb::Type( showTableResp.typeSchemas.at(0) );
+
+	       for (int i = 0; i < gTypeSchema->getColumnCount(); ++i)
+	       {
+		       string colName = gTypeSchema->getColumn(i).getName();
+		       gpudb::Type::Column::ColumnType colType = gTypeSchema->getColumn(i).getType();
+		       gSchemaColumnNames.push_back( colName );
+		       gSchemaColumnTypes.push_back( colType );
+               // TODO: This is where properties would be set
+	       }
+       }
    } catch ( const std::exception &ex )
    {
-       gLogFile->logMessageString( ex.what() );
-       std::cout << "Got exception: " << ex.what() << std::endl; // debug~~~~~~~~~~~~~
+       LOG_KINETICA_ERROR( gLogFile, "Failed to open a reader for table '"
+                           << gKineticaTableName << "' at '" << gKineticaURL
+                           << "': " << ex.what() );
+       return FME_FAILURE;
    }
-
-   // Get the table's record type information
-   std::map<std::string, std::string> options;
-   gpudb::ShowTableResponse showTableResp = gKineticaConnection->showTable(gKineticaTableName, options);
-   if (gSchemaColumnNames.size() == 0)
-   {
-	   // Don't forget to release the resource!
-	   gTypeSchema = new gpudb::Type( showTableResp.typeSchemas.at(0) );
-
-	   for (int i = 0; i < gTypeSchema->getColumnCount(); ++i)
-	   {
-		   string colName = gTypeSchema->getColumn(i).getName();
-		   gpudb::Type::Column::ColumnType colType = gTypeSchema->getColumn(i).getType();
-		   gSchemaColumnNames.push_back( colName );
-		   gSchemaColumnTypes.push_back( colType );
-	   }
-   }
-
+   // We'll read in batches of 500 objects
    gBlockSize  = 500;
 
    return FME_SUCCESS;
@@ -168,10 +170,9 @@ FME_Status KineticaReader::close()
    // -----------------------------------------------------------------------
    // Perform any closing operations / cleanup here; e.g. close opened files
    // -----------------------------------------------------------------------
-
+   LOG_KINETICA_INFO( gLogFile, "Have read " << gNumRead << "records." );
    // Log that the reader is done
-   gLogFile->logMessageString((kMsgClosingReader + dataset_).c_str());
-
+   LOG_KINETICA_INFO( gLogFile, kMsgClosingReader << dataset_ );
    return FME_SUCCESS;
 }
 
@@ -179,7 +180,9 @@ FME_Status KineticaReader::close()
 // Read
 FME_Status KineticaReader::read(IFMEFeature& feature, FME_Boolean& endOfFile)
 {
-	feature.setFeatureType("KineticaFeatureType");
+    bool failed = false;
+
+	feature.setFeatureType( gKineticaTableName.c_str() );
 
     // We are either at the very first read, or have read all the records
     // returned in the previous /get/records call; so must make another
@@ -205,7 +208,9 @@ FME_Status KineticaReader::read(IFMEFeature& feature, FME_Boolean& endOfFile)
         }
         catch ( const gpudb::GPUdbException &ex )
         {
-            std::cout << "Error during reading: " << ex.what() << std::endl;
+            LOG_KINETICA_READER_ERROR( gLogFile, "Failed to read the next batch of "
+                                       << gBlockSize << " records: " << ex.what() );
+            failed = true;
         }
 	}
 
@@ -293,7 +298,11 @@ FME_Status KineticaReader::read(IFMEFeature& feature, FME_Boolean& endOfFile)
 		    }
         } catch (const std::exception &ex )
         {   // Log the exception message
-            std::cout << "Caught exception while reading feature: " << ex.what() << std::endl;
+            LOG_KINETICA_READER_ERROR( gLogFile,
+                                       "On reading the " << KINETICA_GET_ORDINAL_NUMBER( gNumRead )
+                                       << " record since the start, got error from the Kinetica server: "
+                                       << ex.what() );
+            failed = true;
         }
 
         // Update the fact that we've just read another record from the most recent
@@ -319,17 +328,19 @@ FME_Status KineticaReader::read(IFMEFeature& feature, FME_Boolean& endOfFile)
     {
 		endOfFile = FME_TRUE;
 	}
-   
-   return FME_SUCCESS;
-}  // end read
+
+    // Return whether we succeeded or failed
+    if (failed)
+        return FME_FAILURE;
+    return FME_SUCCESS;
+}  // end read()
 
 
 //===========================================================================
 // readSchema
 FME_Status KineticaReader::readSchema(IFMEFeature& feature, FME_Boolean& endOfSchema)
 {
-    std::cout << "In KineticaReader::readSchema()" << std::endl; // debug~~~~~
-	gLogFile->logMessageString("in readSchema");
+    LOG_KINETICA_INFO( gLogFile, "in readSchema" );
 	FMEStringArray connectionInfo;
 	getConnectionInfo(gMappingFile, gLogFile, connectionInfo, readerKeyword_, readerTypeName_);
 	readParametersDialog();
@@ -342,9 +353,11 @@ FME_Status KineticaReader::readSchema(IFMEFeature& feature, FME_Boolean& endOfSc
 		std::map<std::string, std::string> options;
 		gpudb::ShowTableResponse showTableResp = gKineticaConnection->showTable(gKineticaTableName, options);
 		gpudb::Type typeSchema = showTableResp.typeSchemas.at(0);
-		feature.setFeatureType("KineticaFeatureType");
+		feature.setFeatureType( gKineticaTableName.c_str() );
+		//feature.setFeatureType("KineticaFeatureType");
 
-		for (int i = 0; i<typeSchema.getColumnCount(); i++)
+        size_t num_columns = typeSchema.getColumnCount();
+		for (size_t i = 0; i < num_columns; ++i)
         {
             gpudb::Type::Column column = gTypeSchema->getColumn( i );
 			string colName = column.getName();
@@ -381,7 +394,27 @@ FME_Status KineticaReader::readSchema(IFMEFeature& feature, FME_Boolean& endOfSc
                 // String has many properties associated with it
 				case (gpudb::Type::Column::ColumnType::STRING):
 				{
-                    if ( column.hasProperty( gpudb::ColumnProperty::DATE ) )
+                    if ( column.hasProperty( gpudb::ColumnProperty::CHAR1 ) )
+                    {
+                        typeStr = "char1";
+                    }
+                    else if ( column.hasProperty( gpudb::ColumnProperty::CHAR2 ) )
+                        typeStr = "char2";
+                    else if ( column.hasProperty( gpudb::ColumnProperty::CHAR4 ) )
+                        typeStr = "char4";
+                    else if ( column.hasProperty( gpudb::ColumnProperty::CHAR8 ) )
+                        typeStr = "char8";
+                    else if ( column.hasProperty( gpudb::ColumnProperty::CHAR16 ) )
+                        typeStr = "char16";
+                    else if ( column.hasProperty( gpudb::ColumnProperty::CHAR32 ) )
+                        typeStr = "char32";
+                    else if ( column.hasProperty( gpudb::ColumnProperty::CHAR64 ) )
+                        typeStr = "char64";
+                    else if ( column.hasProperty( gpudb::ColumnProperty::CHAR128 ) )
+                        typeStr = "char128";
+                    else if ( column.hasProperty( gpudb::ColumnProperty::CHAR256 ) )
+                        typeStr = "char256";
+                    else if ( column.hasProperty( gpudb::ColumnProperty::DATE ) )
                         typeStr = "date";
                     else if ( column.hasProperty( gpudb::ColumnProperty::TIME ) )
                         typeStr = "time";
@@ -411,7 +444,7 @@ FME_Status KineticaReader::readSchema(IFMEFeature& feature, FME_Boolean& endOfSc
 	}
 	gNumFeatures++;
 	return FME_SUCCESS;	
-}
+}   // end readSchema()
 
 //===========================================================================
 // readParameterDialog
@@ -426,11 +459,11 @@ void KineticaReader::readParametersDialog()
 
       // Let's log to the user that a parameter value has been specified.
       string paramMsg = (kMyFormatParamTag + myFormatParameter_).c_str();
-      gLogFile->logMessageString(paramMsg.c_str(), FME_WARN);
+      LOG_KINETICA_WARN( gLogFile, paramMsg );
    }
    else
    {
-      // Log that no parameter value was entered.
-      gLogFile->logMessageString(kMsgNoMyFormatParam, FME_WARN);
+      // Log that no parameter value was entered
+      LOG_KINETICA_WARN( gLogFile, kMsgNoMyFormatParam );
    }
 }

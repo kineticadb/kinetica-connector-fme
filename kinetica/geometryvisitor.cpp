@@ -36,6 +36,7 @@
 #include "geometryvisitor.h"
 #include "kineticapriv.h"
 #include "kineticawriter.h"
+#include "kineticautil.h"
 
 #include <fmetypes.h>
 #include <iaggregate.h>
@@ -101,7 +102,7 @@ GeometryVisitor::~GeometryVisitor()
 //
 FME_Status GeometryVisitor::visitAggregate(const IFMEAggregate& aggregate)
 {
-   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("aggregate")).c_str());
+   LOG_KINETICA_INFO( KineticaWriter::gLogFile, kMsgStartVisiting << "aggregate");
 
    FME_Status badNews;
 
@@ -111,8 +112,6 @@ FME_Status GeometryVisitor::visitAggregate(const IFMEAggregate& aggregate)
    {
       // Create visitor to visit aggregate geometries
       GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
-
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("aggregate geometry")).c_str());
 
       if (NULL != iterator->getPart())
       {
@@ -128,8 +127,6 @@ FME_Status GeometryVisitor::visitAggregate(const IFMEAggregate& aggregate)
    // Done with the iterator, destroy it
    aggregate.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("aggregate")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -137,8 +134,6 @@ FME_Status GeometryVisitor::visitAggregate(const IFMEAggregate& aggregate)
 //
 FME_Status GeometryVisitor::visitPoint(const IFMEPoint& point)
 {
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("point")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -146,8 +141,6 @@ FME_Status GeometryVisitor::visitPoint(const IFMEPoint& point)
 //
 FME_Status GeometryVisitor::visitMultiPoint(const IFMEMultiPoint& multipoint)
 {
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("multi point")).c_str());
-
    FME_Status badNews;
 
    // Create a point iterator
@@ -156,8 +149,6 @@ FME_Status GeometryVisitor::visitMultiPoint(const IFMEMultiPoint& multipoint)
    {
       // Create visitor to visit the next geometry
       GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
-
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("point")).c_str());
 
       badNews = iterator->getPart()->acceptGeometryVisitorConst(visitor);
       if (badNews)
@@ -168,8 +159,6 @@ FME_Status GeometryVisitor::visitMultiPoint(const IFMEMultiPoint& multipoint)
    }
    // We are done with the iterator, so destroy it
    multipoint.destroyIterator(iterator);
-
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("multi point")).c_str());
 
    return FME_SUCCESS;
 }
@@ -204,14 +193,10 @@ FME_Status GeometryVisitor::visitArcBCP(const IFMEArc& arc)
    FME_Status badNews;
    IFMEPoint* point = fmeGeometryTools_->createPoint();
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("arc by center point")).c_str());
-
    // Create visitor to visit points of the arc
    GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
 
    // Get the center point
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("center point")).c_str());
-
    badNews = arc.getCenterPoint(*point);
    if (badNews)
    {
@@ -230,8 +215,6 @@ FME_Status GeometryVisitor::visitArcBCP(const IFMEArc& arc)
    if (arc.hasExplicitEndpoints())
    {
       // Get the start point
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("start point")).c_str());
-
       badNews = arc.getStartPoint(*point);
       if (badNews)
       {
@@ -247,8 +230,6 @@ FME_Status GeometryVisitor::visitArcBCP(const IFMEArc& arc)
       }
 
       // Get the end point
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("end point")).c_str());
-
       badNews = arc.getEndPoint(*point);
       if (badNews)
       {
@@ -266,8 +247,6 @@ FME_Status GeometryVisitor::visitArcBCP(const IFMEArc& arc)
 
    fmeGeometryTools_->destroyGeometry(static_cast<IFMEGeometry*>(point));
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("arc by center point")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -278,14 +257,10 @@ FME_Status GeometryVisitor::visitArcBB(const IFMEArc& arc)
    FME_Status badNews;
    IFMEPoint* point = fmeGeometryTools_->createPoint();
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("arc by bulge")).c_str());
-
    // Create visitor to visit points of the arc
    GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
 
    // Get the start point
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("start point")).c_str());
-
    badNews = arc.getStartPoint(*point);
    if (badNews)
    {
@@ -301,8 +276,6 @@ FME_Status GeometryVisitor::visitArcBB(const IFMEArc& arc)
    }
 
    // Get the end point
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("end point")).c_str());
-
    badNews = arc.getEndPoint(*point);
    if (badNews)
    {
@@ -318,8 +291,6 @@ FME_Status GeometryVisitor::visitArcBB(const IFMEArc& arc)
    }
 
    // Get the bulge
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("bulge")).c_str());
-
    FME_Real64 bulge;
    badNews = arc.getBulge(bulge);
    if (badNews)
@@ -328,8 +299,6 @@ FME_Status GeometryVisitor::visitArcBB(const IFMEArc& arc)
       fmeGeometryTools_->destroyGeometry(static_cast<IFMEGeometry*>(point));
       return FME_FAILURE;
    }
-
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("arc by bulge")).c_str());
 
    fmeGeometryTools_->destroyGeometry(static_cast<IFMEGeometry*>(point));
 
@@ -340,7 +309,7 @@ FME_Status GeometryVisitor::visitArcBB(const IFMEArc& arc)
 //
 FME_Status GeometryVisitor::visitArcB3P(const IFMEArc& arc)
 {
-   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("arc by 3 points")).c_str());
+   LOG_KINETICA_INFO( KineticaWriter::gLogFile, kMsgStartVisiting << "arc by 3 points");
 
    FME_Status badNews;
 
@@ -361,8 +330,6 @@ FME_Status GeometryVisitor::visitArcB3P(const IFMEArc& arc)
    }
 
    // Visit the start point geometry
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("start point")).c_str());
-
    badNews = startPoint->acceptGeometryVisitorConst(visitor);
    if (badNews)
    {
@@ -373,8 +340,6 @@ FME_Status GeometryVisitor::visitArcB3P(const IFMEArc& arc)
    }
 
    // Visit the mid point geometry
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("mid point")).c_str());
-
    badNews = midPoint->acceptGeometryVisitorConst(visitor);
    if (badNews)
    {
@@ -385,8 +350,6 @@ FME_Status GeometryVisitor::visitArcB3P(const IFMEArc& arc)
    }
 
    // Visit the end point geometry
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("end point")).c_str());
-
    badNews = endPoint->acceptGeometryVisitorConst(visitor);
    if (badNews)
    {
@@ -400,8 +363,6 @@ FME_Status GeometryVisitor::visitArcB3P(const IFMEArc& arc)
    fmeGeometryTools_->destroyGeometry(static_cast<IFMEGeometry*>(endPoint));
    fmeGeometryTools_->destroyGeometry(static_cast<IFMEGeometry*>(midPoint));
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("arc by bulge")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -409,8 +370,7 @@ FME_Status GeometryVisitor::visitArcB3P(const IFMEArc& arc)
 //
 FME_Status GeometryVisitor::visitLine(const IFMELine& line)
 {
-   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("line")).c_str());
-
+   LOG_KINETICA_INFO( KineticaWriter::gLogFile, kMsgVisiting << "line" );
    return FME_SUCCESS;
 }
 
@@ -420,8 +380,6 @@ FME_Status GeometryVisitor::visitPath(const IFMEPath& path)
 {
    FME_Status badNews;
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("path")).c_str());
-
    // Create iterator to get all segments in the path
    IFMESegmentIterator* iterator = path.getIterator();
    while (iterator->next())
@@ -429,7 +387,6 @@ FME_Status GeometryVisitor::visitPath(const IFMEPath& path)
       // There is a segment to the path to add, create a visitor to get the segment string
       GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
 
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("segment")).c_str());
       badNews = iterator->getPart()->acceptGeometryVisitorConst(visitor);
       if (badNews)
       {
@@ -441,8 +398,6 @@ FME_Status GeometryVisitor::visitPath(const IFMEPath& path)
    // We are done with the iterator, so destroy it
    path.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("path")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -452,16 +407,12 @@ FME_Status GeometryVisitor::visitMultiCurve(const IFMEMultiCurve& multicurve)
 {
    FME_Status badNews;
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("multi curve")).c_str());
-
    // Create an iterator to get the curves
    IFMECurveIterator* iterator = multicurve.getIterator();
    while (iterator->next())
    {
       // Create a visitor to visit the next curve
       GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
-
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("curve")).c_str());
 
       badNews = iterator->getPart()->acceptGeometryVisitorConst(visitor);
       if (badNews)
@@ -474,8 +425,6 @@ FME_Status GeometryVisitor::visitMultiCurve(const IFMEMultiCurve& multicurve)
    // Done visiting curves, destroy iterator
    multicurve.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("multi curve")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -485,16 +434,12 @@ FME_Status GeometryVisitor::visitMultiArea(const IFMEMultiArea& multiarea)
 {
    FME_Status badNews;
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("multi area")).c_str());
-
    // Create iterator to visit all areas
    IFMEAreaIterator* iterator = multiarea.getIterator();
    while (iterator->next())
    {
       // Create a visitor to visit areas
       GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
-
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("area")).c_str());
 
       badNews = iterator->getPart()->acceptGeometryVisitorConst(visitor);
       if (badNews)
@@ -507,8 +452,6 @@ FME_Status GeometryVisitor::visitMultiArea(const IFMEMultiArea& multiarea)
    // Done with iterator, destroy it
    multiarea.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("multi area")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -517,8 +460,6 @@ FME_Status GeometryVisitor::visitMultiArea(const IFMEMultiArea& multiarea)
 FME_Status GeometryVisitor::visitPolygon(const IFMEPolygon& polygon)
 {
    FME_Status badNews;
-
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("polygon")).c_str());
 
    // Create visitor to visit polygon curve geometry
    GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
@@ -544,14 +485,10 @@ FME_Status GeometryVisitor::visitDonut(const IFMEDonut& donut)
 {
    FME_Status badNews;
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("donut")).c_str());
-
    // Create visitor to visit boundaries
    GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
 
    // Get the outer boundary
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("outer boundary")).c_str());
-
    const IFMEArea* outerBoundary = donut.getOuterBoundaryAsSimpleArea();
    if (outerBoundary == NULL)
    {
@@ -565,8 +502,6 @@ FME_Status GeometryVisitor::visitDonut(const IFMEDonut& donut)
    }
 
    // Get the inner boundary
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("inner boundary")).c_str());
-
    IFMESimpleAreaIterator* iterator = donut.getIterator();
    while (iterator->next())
    {
@@ -580,8 +515,6 @@ FME_Status GeometryVisitor::visitDonut(const IFMEDonut& donut)
    // Done with iterator, destroy it
    donut.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("donut")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -590,8 +523,6 @@ FME_Status GeometryVisitor::visitDonut(const IFMEDonut& donut)
 FME_Status GeometryVisitor::visitText(const IFMEText& text)
 {
    FME_Status badNews;
-
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("text")).c_str());
 
    // Create visitor to visit location
    GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
@@ -611,16 +542,12 @@ FME_Status GeometryVisitor::visitMultiText(const IFMEMultiText& multitext)
 {
    FME_Status badNews;
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("multi text")).c_str());
-
    // Create iterator to get all text geometries
    IFMETextIterator* iterator = multitext.getIterator();
    while (iterator->next())
    {
       // Create visitor to visit next text geometry
       GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
-
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("text")).c_str());
 
       badNews = iterator->getPart()->acceptGeometryVisitorConst(visitor);
       if (badNews)
@@ -632,8 +559,6 @@ FME_Status GeometryVisitor::visitMultiText(const IFMEMultiText& multitext)
    // Done with iterator, destroy it
    multitext.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("multi text")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -642,8 +567,6 @@ FME_Status GeometryVisitor::visitMultiText(const IFMEMultiText& multitext)
 FME_Status GeometryVisitor::visitEllipse(const IFMEEllipse& ellipse)
 {
    FME_Status badNews;
-
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("ellipse")).c_str());
 
    GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
 
@@ -666,8 +589,6 @@ FME_Status GeometryVisitor::visitEllipse(const IFMEEllipse& ellipse)
 //
 FME_Status GeometryVisitor::visitNull(const IFMENull& fmeNull)
 {
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("null")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -675,8 +596,6 @@ FME_Status GeometryVisitor::visitNull(const IFMENull& fmeNull)
 //
 FME_Status GeometryVisitor::visitRaster(const IFMERaster& raster)
 {
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("raster")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -685,8 +604,6 @@ FME_Status GeometryVisitor::visitRaster(const IFMERaster& raster)
 FME_Status GeometryVisitor::visitFace(const IFMEFace& face)
 {
    FME_Status badNews;
-
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("face")).c_str());
 
    GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
 
@@ -710,8 +627,6 @@ FME_Status GeometryVisitor::visitFace(const IFMEFace& face)
 //
 FME_Status GeometryVisitor::visitTriangleStrip(const IFMETriangleStrip& triangleStrip)
 {
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("triangle strip")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -719,8 +634,6 @@ FME_Status GeometryVisitor::visitTriangleStrip(const IFMETriangleStrip& triangle
 //
 FME_Status GeometryVisitor::visitTriangleFan(const IFMETriangleFan& triangleFan)
 {
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("triangle fan")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -728,8 +641,6 @@ FME_Status GeometryVisitor::visitTriangleFan(const IFMETriangleFan& triangleFan)
 //
 FME_Status GeometryVisitor::visitBox(const IFMEBox& box)
 {
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("box")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -739,13 +650,11 @@ FME_Status GeometryVisitor::visitExtrusion(const IFMEExtrusion& extrusion)
 {
    FME_Status badNews;
 
-   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("extrusion")).c_str());
+   LOG_KINETICA_INFO( KineticaWriter::gLogFile, kMsgStartVisiting << "extrusion" );
 
    GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
 
    // Get the base of the extrusion
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("face")).c_str());
-
    const IFMEFace* extrusionBase = extrusion.getBaseAsFace();
    if (extrusionBase == NULL)
    {
@@ -758,8 +667,6 @@ FME_Status GeometryVisitor::visitExtrusion(const IFMEExtrusion& extrusion)
       return FME_FAILURE;
    }
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("extrusion")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -769,13 +676,9 @@ FME_Status GeometryVisitor::visitBRepSolid(const IFMEBRepSolid& brepSolid)
 {
    FME_Status badNews;
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("boundary representation solid")).c_str());
-
    GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
 
    // Get the outer surface
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("outer surface")).c_str());
-
    const IFMESurface* outerSurface = brepSolid.getOuterSurface();
    if (outerSurface == NULL)
    {
@@ -795,8 +698,6 @@ FME_Status GeometryVisitor::visitBRepSolid(const IFMEBRepSolid& brepSolid)
       // Get the next inner surface
       const IFMESurface* innerSurface = iterator->getPart();
      
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("inner surface")).c_str());
-
       // Set the inner surface geometry string
       badNews = innerSurface->acceptGeometryVisitorConst(visitor);
       if (badNews)
@@ -810,8 +711,6 @@ FME_Status GeometryVisitor::visitBRepSolid(const IFMEBRepSolid& brepSolid)
    // Done with the iterator
    brepSolid.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("boundary representation solid")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -821,8 +720,6 @@ FME_Status GeometryVisitor::visitCompositeSurface(const IFMECompositeSurface& co
 {
    FME_Status badNews;
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("composite surface")).c_str());
-
    // Create an iterator to loop through all the surfaces this composite contains
    IFMESurfaceIterator* iterator = compositeSurface.getIterator();
    while (iterator->next())
@@ -831,8 +728,6 @@ FME_Status GeometryVisitor::visitCompositeSurface(const IFMECompositeSurface& co
 
       // Get the next surface
       const IFMESurface* surface = iterator->getPart();
-
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("surface")).c_str());
 
       // Set the surface geometry string
       badNews = surface->acceptGeometryVisitorConst(visitor);
@@ -847,8 +742,6 @@ FME_Status GeometryVisitor::visitCompositeSurface(const IFMECompositeSurface& co
    // Done with the iterator
    compositeSurface.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("composite surface")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -856,8 +749,6 @@ FME_Status GeometryVisitor::visitCompositeSurface(const IFMECompositeSurface& co
 //
 FME_Status GeometryVisitor::visitRectangleFace(const IFMERectangleFace& rectangle)
 {
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("rectangle face")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -866,8 +757,6 @@ FME_Status GeometryVisitor::visitRectangleFace(const IFMERectangleFace& rectangl
 FME_Status GeometryVisitor::visitMultiSurface(const IFMEMultiSurface& multiSurface)
 {
    FME_Status badNews;
-
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("multi surface")).c_str());
 
    // Create an iterator to loop through all the surfaces this multi surface contains
    IFMESurfaceIterator* iterator = multiSurface.getIterator();
@@ -879,8 +768,6 @@ FME_Status GeometryVisitor::visitMultiSurface(const IFMEMultiSurface& multiSurfa
       const IFMESurface* surface = iterator->getPart();
 
       // Set the surface geometry string
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("surface")).c_str());
-
       badNews = surface->acceptGeometryVisitorConst(visitor);
       if (badNews)
       {
@@ -893,8 +780,6 @@ FME_Status GeometryVisitor::visitMultiSurface(const IFMEMultiSurface& multiSurfa
    // Done with the iterator
    multiSurface.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("multi surface")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -903,8 +788,6 @@ FME_Status GeometryVisitor::visitMultiSurface(const IFMEMultiSurface& multiSurfa
 FME_Status GeometryVisitor::visitMultiSolid(const IFMEMultiSolid& multiSolid)
 {
    FME_Status badNews;
-
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("multi solid")).c_str());
 
    // Create an iterator to loop through all the solids this multi solid contains
    IFMESolidIterator* iterator = multiSolid.getIterator();
@@ -916,8 +799,6 @@ FME_Status GeometryVisitor::visitMultiSolid(const IFMEMultiSolid& multiSolid)
       const IFMESolid* solid = iterator->getPart();
 
       // Set the solid geometry string
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("solid")).c_str());
-
       badNews = solid->acceptGeometryVisitorConst(visitor);
       if (badNews)
       {
@@ -930,8 +811,6 @@ FME_Status GeometryVisitor::visitMultiSolid(const IFMEMultiSolid& multiSolid)
    // Done with the iterator
    multiSolid.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("multi solid")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -941,7 +820,7 @@ FME_Status GeometryVisitor::visitCompositeSolid(const IFMECompositeSolid& compos
 {
    FME_Status badNews;
 
-   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("composite solid")).c_str());
+   LOG_KINETICA_INFO( KineticaWriter::gLogFile, kMsgStartVisiting << "composite solid" );
 
    // Create an iterator to loop through all the simple solids this composite solid contains
    IFMESimpleSolidIterator* iterator = compositeSolid.getIterator();
@@ -953,8 +832,6 @@ FME_Status GeometryVisitor::visitCompositeSolid(const IFMECompositeSolid& compos
       const IFMESimpleSolid* simpleSolid = iterator->getPart();
 
       // Set the simple solid geometry string
-//      KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("simple solid")).c_str());
-
       badNews = simpleSolid->acceptGeometryVisitorConst(visitor);
       if (badNews)
       {
@@ -967,8 +844,6 @@ FME_Status GeometryVisitor::visitCompositeSolid(const IFMECompositeSolid& compos
    // Done with the iterator
    compositeSolid.destroyIterator(iterator);
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("composite solid")).c_str());
-
    return FME_SUCCESS;
 }
 
@@ -978,14 +853,10 @@ FME_Status GeometryVisitor::visitCSGSolid(const IFMECSGSolid& csgSolid)
 {
    FME_Status badNews;
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgStartVisiting) + string("CSG solid")).c_str());
-
    // Convert the IFMECSGSolid to either an IFMEMultiSolid, IFMEBRepSolid, or IFMENull.
    const IFMEGeometry* geomCSGSolid = csgSolid.evaluateCSG();
 
    GeometryVisitor visitor(fmeGeometryTools_, fmeSession_);
-
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgVisiting) + string("CSG solid component")).c_str());
 
    badNews = geomCSGSolid->acceptGeometryVisitorConst(visitor);
    if (badNews)
@@ -998,8 +869,6 @@ FME_Status GeometryVisitor::visitCSGSolid(const IFMECSGSolid& csgSolid)
    // Done with the geomCSGSolid
    fmeGeometryTools_->destroyGeometry(const_cast<IFMEGeometry*>(geomCSGSolid));
 
-//   KineticaWriter::gLogFile->logMessageString((string(kMsgEndVisiting) + string("CSG solid")).c_str());
-   
    return FME_SUCCESS;
 }
 

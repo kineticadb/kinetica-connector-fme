@@ -38,7 +38,6 @@
 #include <fmewrt.h>
 #include <sstream>
 #include <string>
-//#include "C:\Users\IEUser\Documents\gpudb-api-cpp\gpudb\GPUdb.hpp"
 #include <gpudb/GPUdb.hpp>
 #include <fmestring.h>
 
@@ -143,7 +142,8 @@ private:
 	string							 gKineticaUsername;
 	string							 gKineticaPassword;
 	vector<gpudb::GenericRecord>     gKineticaRecordList;
-	int                              numCached = 0;
+	size_t                           numCached   = 0;
+    size_t                           numInserted = 0;
 
 	gpudb::Type::Column getKineticaColumn(FMEString attribName, FMEString attribValue);
    //---------------------------------------------------------------

@@ -79,7 +79,10 @@
 #include <sstream>
 #include <cstring>
 
-#include <gpudb/GPUdb.hpp>
+#include "gpudb/GPUdb.hpp"
+
+// For parsing date, time, and datetime
+#include <boost/regex.hpp>
 
 // These are initialized externally when a writer object is created so all
 // methods in this file can assume they are ready to use.
@@ -131,117 +134,159 @@ gpudb::Type::Column KineticaWriter::getKineticaColumn(FMEString attribName, FMES
 	if ( valueStrVector.size() > 1 )
 	{   // Note the +1 for the begin
 		properties.assign( valueStrVector.begin() + 1, valueStrVector.end() );
-	}
- //   string extraPropsStr;
-	//try
-	//{
-	//	extraPropsStr = valueStrVector.at(1);
-	//}
-	//catch (const std::exception& ex)
-	//{
-	//	extraPropsStr = "";
-	//}
 
-//	gLogFile->logMessageString(("attrib type:" + valueStr).c_str());
-//	gLogFile->logMessageString(("extraPropsStr:" + extraPropsStr).c_str());
+        // Check nullability--unless explicitly declared to be a not-nullable
+        // column, make it nullable.  Be careful about it being a primary key
+        // (in which case it cannot be nullable).
+        std::vector<std::string>::const_iterator not_null_keyword;
+        not_null_keyword = std::find( properties.begin(), properties.end(),
+                                      KINETICA_PROPERTY_NOT_NULLABLE );
+        // Make the collumn nullable by default
+        if ( not_null_keyword == properties.end() )
+        {  // i.e. "not_nullable" NOT found
+            // But, ensure it's not also a primary key
+            if ( std::find( properties.begin(), properties.end(),
+                            KINETICA_PROPERTY_PRIMARY_KEY ) == properties.end() )
+            {  // NOT a primary key
+                properties.push_back( gpudb::ColumnProperty::NULLABLE );
+            }
+        }
+        else  // the keyword "not_nullable" was found; remove it from the
+        {     // since it's not a valid Kinetica property
+            // Note that we're not making this column nullable
+            properties.erase( not_null_keyword );
+        }   // end inner if
+	}
+    else
+    {
+        // No properties given; make the column nullable by default (since it's
+        // not also a primary key, it's safe to do)
+        properties.push_back( gpudb::ColumnProperty::NULLABLE );
+    }   // end outer if
 
 	if (typeStr == "string")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating straight string" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::STRING;
 	}
 	else if (typeStr == "real32")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating float" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::FLOAT;
 	}
 	else if (typeStr == "real64")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating double" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::DOUBLE;
 	}
 	else if (typeStr == "int64")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating straight long" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::LONG;
 	}
 	else if (typeStr == "int32")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating int" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::INT;
 	}
 	else if (typeStr == "int16")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating int16" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::INT;
 		properties.push_back( gpudb::ColumnProperty::INT16 );
 	}
 	else if (typeStr == "int8")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating int8" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::INT;
 		properties.push_back( gpudb::ColumnProperty::INT8);
 	}
 	else if (typeStr == "date")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating date" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::STRING;
 		properties.push_back( gpudb::ColumnProperty::DATE );
 	}
 	else if (typeStr == "time")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating time" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::STRING;
 		properties.push_back( gpudb::ColumnProperty::TIME );
 	}
 	else if (typeStr == "datetime")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating datetime" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::STRING;
 		properties.push_back( gpudb::ColumnProperty::DATETIME );
 	}
 	else if (typeStr == "decimal")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating decimal" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::STRING;
 		properties.push_back( gpudb::ColumnProperty::DECIMAL );
 	}
 	else if (typeStr == "IPv4")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating ipv4" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::STRING;
 		properties.push_back( gpudb::ColumnProperty::IPV4 );
 	}
 	else if (typeStr == "WKT")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating wkt" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::STRING;
 		properties.push_back( gpudb::ColumnProperty::WKT );
 	}
 	else if (typeStr == "timestamp")
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating long timestamp" << std::endl; // debug~~~~~~~~~~
 		colType = gpudb::Type::Column::LONG;
 		properties.push_back( gpudb::ColumnProperty::TIMESTAMP );
 	}
-	//else if (std::string(typeStr, 0, 4) == "char")
-	//{
-	//	colType = gpudb::Type::Column::STRING;
-	//}
-	//else if (typeStr == "bytes")
-	//{
-	//	colType = gpudb::Type::Column::BYTES;
-	//}
+	else if (typeStr == "char1")
+	{
+		colType = gpudb::Type::Column::STRING;
+		properties.push_back( gpudb::ColumnProperty::CHAR1 );
+	}
+	else if (typeStr == "char2")
+	{
+		colType = gpudb::Type::Column::STRING;
+		properties.push_back( gpudb::ColumnProperty::CHAR2 );
+	}
+	else if (typeStr == "char4")
+	{
+		colType = gpudb::Type::Column::STRING;
+		properties.push_back( gpudb::ColumnProperty::CHAR4 );
+	}
+	else if (typeStr == "char8")
+	{
+		colType = gpudb::Type::Column::STRING;
+		properties.push_back( gpudb::ColumnProperty::CHAR8 );
+	}
+	else if (typeStr == "char16")
+	{
+		colType = gpudb::Type::Column::STRING;
+		properties.push_back( gpudb::ColumnProperty::CHAR16 );
+	}
+	else if (typeStr == "char32")
+	{
+		colType = gpudb::Type::Column::STRING;
+		properties.push_back( gpudb::ColumnProperty::CHAR32 );
+	}
+	else if (typeStr == "char64")
+	{
+		colType = gpudb::Type::Column::STRING;
+		properties.push_back( gpudb::ColumnProperty::CHAR64 );
+	}
+	else if (typeStr == "char128")
+	{
+		colType = gpudb::Type::Column::STRING;
+		properties.push_back( gpudb::ColumnProperty::CHAR128 );
+	}
+	else if (typeStr == "char256")
+	{
+		colType = gpudb::Type::Column::STRING;
+		properties.push_back( gpudb::ColumnProperty::CHAR256 );
+	}
+	else if (typeStr == "bytes")
+	{
+		colType = gpudb::Type::Column::BYTES;
+	}
 	else
 	{
-        //std::cout << "KineticaWriter::getKineticaColumn() creating string (in else)" << std::endl; // debug~~~~~~~~~~
-		colType = gpudb::Type::Column::STRING;
+		throw std::runtime_error( "Unknown column type: " + typeStr );
 	}
 
 	gpudb::Type::Column column = gpudb::Type::Column(columnName, colType, properties);
-    //std::cout << "Column " << columnName << " is nullable? " << column.isNullable() << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~
 	return(column);
-}
+}   // end getKineticaColumn
+
 
 //===========================================================================
 // Open
@@ -273,7 +318,7 @@ FME_Status KineticaWriter::open(const char* datasetName, const IFMEStringArray& 
 
    // Log an opening writer message
    string msgOpeningWriter = kMsgOpeningWriter + dataset_;
-   gLogFile->logMessageString( msgOpeningWriter.c_str() );
+   LOG_KINETICA_INFO( gLogFile, msgOpeningWriter );
 
 
    // Read the settings box and log
@@ -298,50 +343,52 @@ FME_Status KineticaWriter::open(const char* datasetName, const IFMEStringArray& 
 
    try
    {
-       std::cout << "Opening writer to table '" << gKineticaTableName << "' on Kinetica database at " << gKineticaURL << std::endl;
+       LOG_KINETICA_INFO( gLogFile, "Opening writer to table '" << gKineticaTableName
+                                     << "' on Kinetica database at " << gKineticaURL );
        gKineticaConnection = new gpudb::GPUdb(gKineticaURL, options);
    } catch (const std::exception &ex)
    {
-       std::cout << "Attempt to connect to Kinetica failed: " << ex.what() << std::endl;
+       LOG_KINETICA_WRITER_ERROR( gLogFile, "Attempt to connect to Kinetica failed: " << ex.what() );
+       return FME_FAILURE;
    }
 
    // Fetch all the schema features and add the DEF lines.
    KineticaWriter::addDefLineToSchema(parameters);
    
-   //Get writer schema and create Kinetica type and table
-   FMEStringArray attribNames;
-   schemaFeature_->getAllAttributeNames(attribNames);
-   for (int i = 0; i < attribNames->entries(); ++i)
-   {
-	   FMEString attribName;
-	   attribNames->getElement( i, attribName );
-
-	   FMEString attribValue;
-	   schemaFeature_->getEncodedAttribute( attribName, kFME_CP367, attribValue );
-	   gKineticaColumns.push_back( getKineticaColumn( attribName, attribValue ) );
-   }
-
-
-   if ( (gKineticaGeometryField.size() > 0) && (gKineticaGeometryField != "<Unused>") )
-   {
-		FMEString geometryField(gKineticaGeometryField.c_str());
-		FMEString attribValue("string");
-		gKineticaColumns.push_back(getKineticaColumn(geometryField, attribValue));
-   }
-
-
-   if ((gKineticaPointX.size() > 0) && (gKineticaPointX != "<Unused>"))
-   {
-	   FMEString pointXField(gKineticaPointX.c_str());
-	   FMEString pointYField(gKineticaPointY.c_str());
-	   FMEString attribValue("real64");
-	   gKineticaColumns.push_back(getKineticaColumn(pointXField, attribValue));
-	   gKineticaColumns.push_back(getKineticaColumn(pointYField, attribValue));
-   }
-
+   // Get the writer schema and create Kinetica type and table
    try
    {
-	   gKineticaType = new gpudb::Type("kinetica_type", gKineticaColumns);
+       FMEStringArray attribNames;
+       schemaFeature_->getAllAttributeNames(attribNames);
+       for (int i = 0; i < attribNames->entries(); ++i)
+       {
+           FMEString attribName;
+           attribNames->getElement( i, attribName );
+
+           FMEString attribValue;
+           schemaFeature_->getEncodedAttribute( attribName, kFME_CP367, attribValue );
+           gKineticaColumns.push_back( getKineticaColumn( attribName, attribValue ) );
+       }
+
+
+       if ( (gKineticaGeometryField.size() > 0) && (gKineticaGeometryField != "<Unused>") )
+       {
+           FMEString geometryField(gKineticaGeometryField.c_str());
+           FMEString attribValue("string");
+           gKineticaColumns.push_back(getKineticaColumn(geometryField, attribValue));
+       }
+
+
+       if ((gKineticaPointX.size() > 0) && (gKineticaPointX != "<Unused>"))
+       {
+           FMEString pointXField(gKineticaPointX.c_str());
+           FMEString pointYField(gKineticaPointY.c_str());
+           FMEString attribValue("real64");
+           gKineticaColumns.push_back(getKineticaColumn(pointXField, attribValue));
+           gKineticaColumns.push_back(getKineticaColumn(pointYField, attribValue));
+       }
+
+       gKineticaType = new gpudb::Type("kinetica_type", gKineticaColumns);
 	   std::string type_id = gKineticaType->create( *gKineticaConnection );
 
 	   std::map<std::string, std::string> options;
@@ -365,7 +412,7 @@ FME_Status KineticaWriter::open(const char* datasetName, const IFMEStringArray& 
                throw gpudb::GPUdbException( "Could not create a table of the given type." );
            }
            // Check if the two types match
-           if ( *gKineticaType != *existing_table_type )
+           if ( gKineticaType->isTypeCompatible( *existing_table_type ) )
            {
                throw gpudb::GPUdbException( "Could not create a table of the given type; a table with the same name already exists in Kinetica, but has a different type; please either change name (" + gKineticaTableName + ") for table to be created, or delete pre-existing table." );
            }
@@ -374,7 +421,7 @@ FME_Status KineticaWriter::open(const char* datasetName, const IFMEStringArray& 
    }
    catch (const std::exception& ex)
    {
-	   std::cout << "Caught Exception: " << ex.what() << std::endl;
+	   LOG_KINETICA_WRITER_ERROR( gLogFile, ex.what() );
        return FME_FAILURE;
    }
 
@@ -407,19 +454,27 @@ FME_Status KineticaWriter::close()
 	std::map<std::string, std::string> options;
 	options["return_record_ids"] = "false";  // optionally request record_ids
 
+    bool failure = false;
 	try
 	{
-		gLogFile->logMessageString((kMsgClosingWriter + dataset_).c_str());
+        LOG_KINETICA_INFO( gLogFile, kMsgClosingWriter << dataset_ );
 		if (!gKineticaRecordList.empty())
 		{
 			gpudb::InsertRecordsResponse response = gKineticaConnection->insertRecords(gKineticaTableName, gKineticaRecordList, options);
+            numInserted += gKineticaRecordList.size();
 			gKineticaRecordList.clear();
 		}
-
+        LOG_KINETICA_INFO( gLogFile, "A total of " << numInserted << " records have been inserted." );
 	}
 	catch (const std::exception& ex)
 	{
-		std::cout << "Caught Exception: " << ex.what() << std::endl;
+        LOG_KINETICA_WRITER_ERROR( gLogFile, "Probelm during insertion of the "
+            << KINETICA_GET_ORDINAL_NUMBER(numInserted) << " to "
+            << KINETICA_GET_ORDINAL_NUMBER(numInserted + numCached)
+            << " records into table '"
+            << gKineticaTableName << "': " << ex.what() );
+//        LOG_KINETICA_WRITER_ERROR( gLogFile, ex.what() );
+        failure = true;
 	}
 
    // Delete the visitor
@@ -436,10 +491,13 @@ FME_Status KineticaWriter::close()
    }
 
    // Log that the writer is done
-   gLogFile->logMessageString((kMsgClosingWriter + dataset_).c_str());
+   LOG_KINETICA_INFO( gLogFile, kMsgClosingWriter << dataset_ );
 
+   // Return whether we succeeded or not
+   if (failure)
+       return FME_FAILURE;
    return FME_SUCCESS;
-}
+}  // end close()
 
 
 string handleEmpty(string value, gpudb::Type::Column::ColumnType colType) 
@@ -462,9 +520,20 @@ string handleEmpty(string value, gpudb::Type::Column::ColumnType colType)
 
 //===========================================================================
 // Write
+
+// Regular expressions needed for parsing FME's datetime formats
+// Date: YYYYmmdd
+static boost::regex fme_date_regex( "\\A(\\d{4})(\\d{2})(\\d{2})$" );
+// Time: HHMMSS[.000]
+static boost::regex fme_time_regex( "\\A(\\d{2})(\\d{2})(\\d{2})(\\.(\\d{1,3}))?$" );
+// DateTime: YYYY-MM-DD[ HH:MM:SS[.ffffff]]
+// Note - allow up to 6 decimal digits (but we ignore the last 3)
+static boost::regex fme_datetime_regex( "\\A(\\d{4})(\\d{2})(\\d{2})(?:(\\d{2})(\\d{2})(\\d{2})(?:\\.(\\d{1,6}))?)?$" );
+
+
+
 FME_Status KineticaWriter::write(const IFMEFeature& feature)
 {
-    //std::cout << "KineticaWriter::write begin" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
    // -----------------------------------------------------------------------
    // The feature type and the attributes can be extracted from the feature
    // at this point.
@@ -474,16 +543,13 @@ FME_Status KineticaWriter::write(const IFMEFeature& feature)
 
     // Get the attributes/columns
 	FMEStringArray fmeStringArray;
-    //std::cout << "KineticaWriter::write before getting attr names" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	(const_cast<IFMEFeature&>(feature)).getAllAttributeNames( fmeStringArray );
-    //std::cout << "KineticaWriter::write after getting attr names" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // get attributes and write record to Kinetica
 
 	std::map<std::string, std::string> options;
 	std::vector<gpudb::GenericRecord> record_list;
 
-    //std::cout << "KineticaWriter::write before creating empty datum" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	gpudb::GenericRecord datum( *gKineticaType );
 
     const IFMEGeometry* geometry = (const_cast<IFMEFeature&>(feature)).getGeometry();
@@ -499,32 +565,27 @@ FME_Status KineticaWriter::write(const IFMEFeature& feature)
 
 	try
 	{
-        //std::cout << "KineticaWriter::write before for loop" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (int i = 0; i < gKineticaColumns.size(); ++i) 
 	    {
             const gpudb::Type::Column& column = gKineticaColumns[ i ];
 		    string colNameStr = column.getName();
 		    string colValueStr;
 		    FMEString colName = FMEString( colNameStr.c_str() );
-            //std::cout << "KineticaWriter::write in loop col #" << i << " name " << colNameStr << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 		    FMEString attribValue;
 
 		    if( (asConstPoint != NULL) && (colNameStr == gKineticaPointX) )
 		    {
-                //std::cout << "KineticaWriter::write seting X" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			    FME_Real64	fmeX = asConstPoint->getX();
 			    datum.setAsDouble(colNameStr, fmeX);
 		    }
 		    else if ((asConstPoint != NULL) && (colNameStr == gKineticaPointY))
 		    {
-                //std::cout << "KineticaWriter::write seting Y" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			    FME_Real64	fmeY = asConstPoint->getY();
 			    datum.setAsDouble(colNameStr, fmeY);
 		    }
 		    else if (colNameStr == gKineticaGeometryField)
 		    {
-                //std::cout << "KineticaWriter::write seting geom/wkt" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			    const IFMEGeometry* geometry = (const_cast<IFMEFeature&>(feature)).getGeometry();
 			    FMEString wkt;
 			    string    wktStr;
@@ -534,18 +595,15 @@ FME_Status KineticaWriter::write(const IFMEFeature& feature)
 			    if ( badNews )
 			    {
 				    // There was an error in writing the geometry
-				    gLogFile->logMessageString( kMsgWriteError );
-				    return FME_FAILURE;
+                    throw std::runtime_error( kMsgWriteError );
 			    }
 			    datum.setAsString( colNameStr, colValueStr );
 		    }
 		    else  // regular type; nothing special
 		    {
-                //std::cout << "KineticaWriter::write setting regular" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			    (const_cast<IFMEFeature&>(feature)).getEncodedAttribute(colName, kFME_CP367, attribValue);
 			    colValueStr = attribValue->data();
 
-                //std::cout << "KineticaWriter::write before handle nulls" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // Handle nulls
                 (const_cast<IFMEFeature&>(feature)).getAttributeNullMissingAndType( colNameStr.c_str(),
                     is_value_null, is_missing, attr_type );
@@ -554,24 +612,123 @@ FME_Status KineticaWriter::write(const IFMEFeature& feature)
                     // Make sure that it is a nullable column
                     if ( !column.isNullable() )
                     {
-                        throw gpudb::GPUdbException( "Column '" + colNameStr + "' is not nullable, but got null value; please set the attribute/column type to be nullable (an 'Index' property)" );
+                        throw std::runtime_error( "Column '" + colNameStr
+                                                   + "' is not nullable, but got null "
+                                                   + "value; please *deselect* the "
+                                                   + "'not_nullable' index property for "
+                                                   + "the attribute, or ensure that it "
+                                                   + "is not a primary key." );
                     }
                     datum.setNull( i );
-                    //std::cout << "KineticaWriter::write set null; continuing" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     continue;  // skip to next column
                 }
 
-                //std::cout << "KineticaWriter::write regular; not null" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			    switch (gKineticaColumns.at(i).getType())
+                const gpudb::Type::Column column = gKineticaColumns.at(i);
+			    switch ( column.getType() )
 			    {
 				    case gpudb::Type::Column::STRING:
                     {
-  					    datum.setAsString( colNameStr, colValueStr );
+                        // Does the given value match any special FME format ?
+                        boost::cmatch matches;
+                        // Casting to char* because we may need to change some values
+                        char* colValCStr = (char*)(colValueStr.c_str());
+                        //const char* colValCStr = colValueStr.c_str();
+                        if ( column.hasProperty( gpudb::ColumnProperty::DATE ) )
+                        {   // DATE property
+                            // Fix years < 1000 or > 2900
+                            fixOutOfBoundsDate( gLogFile, colValCStr );
+
+                            // Check if the string is in the fme_date format;
+                            if ( boost::regex_match( colValCStr, matches, fme_date_regex ) )
+                            {   // Yes, it is; need to convert it to the Kinetica format
+                                std::string converted_value;
+                                converted_value.reserve( 11 ); // 'YYYY-MM-DD' 10 digits
+                                converted_value.append( colValCStr, 4 ); // YYYY
+                                converted_value.append( "-" );
+                                converted_value.append( (colValCStr + 4), 2 ); // MM
+                                converted_value.append( "-" );
+                                converted_value.append( (colValCStr + 6), 2 ); // DD
+
+                                colValueStr = converted_value;
+                            }
+                        }  // end date
+                        else if ( column.hasProperty( gpudb::ColumnProperty::DATETIME ) )
+                        {   // DATETIME property
+                            // Fix years < 1000 or > 2900
+                            fixOutOfBoundsDatetime( gLogFile, colValCStr );
+
+                            // Check if the string is in the fme_datetime format
+                            if ( boost::regex_match( colValCStr, matches, fme_datetime_regex ) )
+                            {   // Yes, it is; need to convert it to the Kinetica format
+                                std::string converted_value;
+                                converted_value.reserve( 24 ); // 'YYYY-mm-dd HH:MM:SS[.000]' 23 digits
+                                converted_value.append( colValCStr, 4 ); // YYYY
+                                converted_value.append( "-" );
+                                converted_value.append( (colValCStr + 4), 2 ); // MM
+                                converted_value.append( "-" );
+                                converted_value.append( (colValCStr + 6), 2 ); // DD
+
+                                // The time part is optional
+                                boost::csub_match hour_group  = matches[ 4 ];
+                                boost::csub_match min_group   = matches[ 5 ];
+                                boost::csub_match sec_group   = matches[ 6 ];
+                                boost::csub_match msec_group  = matches[ 7 ];
+                                if ( hour_group.matched )
+                                {
+                                    converted_value.append( " " );
+                                    converted_value.append( hour_group ); // HH
+                                    converted_value.append( ":" );
+                                    converted_value.append( min_group ); // MM
+                                    converted_value.append( ":" );
+                                    converted_value.append( sec_group ); // SS
+                                    if ( msec_group.matched )
+                                    {   // the ms part is optional
+                                        // Will only take the first three digits
+                                        converted_value.append( "." );
+                                        converted_value.append( min_group, 3 ); // fff
+                                    }
+                                }
+
+                                colValueStr = converted_value;
+                            }
+                        }   // end datetime
+                        else if ( column.hasProperty( gpudb::ColumnProperty::TIME ) )
+                        {   // TIME property
+                            if ( boost::regex_match( colValCStr, matches, fme_time_regex ) )
+                            {   // The string is in the fme_time format;
+                                // need to convert it to the Kinetica format
+                                std::string converted_value;
+                                converted_value.reserve( 13 ); // 'HH:MM:SS[.000]' 12 digits
+                                converted_value.append( colValCStr, 2 ); // HH
+                                converted_value.append( ":" );
+                                converted_value.append( (colValCStr + 2), 2 ); // MM
+                                converted_value.append( ":" );
+                                converted_value.append( (colValCStr + 4), 2 ); // SS
+
+                                // Does the optional millisecond exist?
+                                boost::csub_match ms_group  = matches[ 5 ];
+                                if ( ms_group.matched )
+                                {
+                                    converted_value.append( "." );
+                                    converted_value.append( ms_group );
+                                }
+                                colValueStr = converted_value;
+                            } // end time
+                        }  // end FME->Kinetica format conversion
+
+                        // Actually save the value of the string
+                        datum.setAsString( colNameStr, colValueStr );
                         break;
                     }
 
 				    case gpudb::Type::Column::LONG:
+                    {
+                        if ( column.hasProperty( gpudb::ColumnProperty::TIMESTAMP ) )
+                        {
+                            colValueStr = fixOutOfBoundsTimestamp( gLogFile, colValueStr );
+                        }
 					    datum.setAsLong( colNameStr, std::stoll( handleEmpty( colValueStr, gpudb::Type::Column::LONG) ) ); break;
+                    }
 
 				    case gpudb::Type::Column::INT:
 					    datum.setAsInt( colNameStr, std::stoi( handleEmpty( colValueStr, gpudb::Type::Column::INT) ) ); break;
@@ -582,41 +739,47 @@ FME_Status KineticaWriter::write(const IFMEFeature& feature)
 				    case gpudb::Type::Column::DOUBLE:
 					    datum.setAsDouble( colNameStr, std::stod( handleEmpty( colValueStr, gpudb::Type::Column::DOUBLE) ) ); break;
 
-				    default: gLogFile->logMessageString("Fell through to default", FME_WARN); break;
+				    default:
+                        throw std::runtime_error( "Unknown column type." );
 			    }  // end switch
 		    }  // end if-else
 	    }  // end looping over columns
 	}  // end try 
     catch (const std::exception& ex)
 	{
-		std::cout << "Caught Exception: " << ex.what() << std::endl;
-        throw ex;
+        LOG_KINETICA_WRITER_ERROR( gLogFile, "Problem during processing the "
+                                  << KINETICA_GET_ORDINAL_NUMBER(numInserted + numCached) << " record: "
+                                  << ex.what() );
+        return FME_FAILURE;
 	}
 
-    //std::cout << "KineticaWriter::write after loop" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	gKineticaRecordList.push_back( datum );
 	++numCached;
 
 	options["return_record_ids"] = "false";  // optionally request record_ids
 	if (numCached == 1000)
-	{
+	{   // Insert one thousand records at a time
 		try
 		{
-            //std::cout << "KineticaWriter::write before /insert/records" << std::endl; // debug~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			gpudb::InsertRecordsResponse response = gKineticaConnection->insertRecords(gKineticaTableName, gKineticaRecordList, options);
-			numCached = 0;
 			gKineticaRecordList.clear();
-		}
+            numInserted += numCached;
+            numCached = 0;
+        }
 		catch (const std::exception& ex)
 		{
-			std::cout << "Caught Exception: " << ex.what() << " inserting into table:" << gKineticaTableName << std::endl;
-			
+            LOG_KINETICA_WRITER_ERROR( gLogFile, "Probelm during insertion of the "
+                                       << KINETICA_GET_ORDINAL_NUMBER(numInserted) << " to "
+                                       << KINETICA_GET_ORDINAL_NUMBER(numInserted + numCached)
+                                       << " records into table '"
+                                       << gKineticaTableName << "': " << ex.what() );
+			return FME_FAILURE;
 		}
 	}
 	options.clear();
 
    return FME_SUCCESS;
-}  // end write
+}  // end write()
 
 //===========================================================================
 // Add DEF Line to the Schema Feature
@@ -640,9 +803,6 @@ void KineticaWriter::addDefLineToSchema(const IFMEStringArray& parameters)
 
       paramValue = parameters.elementAt(i + 1);
       attrType = paramValue->data();
-
-      //std::cout << "KineticaWriter::addDefLineToSchema() adding col "
-      //          << attrName.c_str() << " and type " << attrType.c_str() << std::endl; // debug~~~~~
 
       // Add the attribute name and type pair to the schema feature.
       schemaFeature_->setSequencedAttribute(attrName.c_str(), attrType.c_str());
