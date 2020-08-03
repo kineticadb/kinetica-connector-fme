@@ -27,7 +27,7 @@ documentation][FME_DOCS].
 
 Before you build this project you must have the following:
 
-* An **FME Desktop** installation with the **SDK** option (e.g. `pluginbuilder` directory). The Windows 
+* An **FME Desktop** installation with the **SDK** option (e.g. `pluginbuilder` directory). The Windows
 and Linux FME SDK's are assumed to be built from a directory under `<FME-HOME-DIR>/pluginbuilder`.
 * **Visual Studio 2015** build tools.
 * A version of `gpudb-api-cpp` compiled with **VS 2015**.
@@ -36,13 +36,13 @@ and Linux FME SDK's are assumed to be built from a directory under `<FME-HOME-DI
 
 This project requires the `gpudb-api-cpp` library compiled with **Visual Studio 2015** build tools.
 
-A copy of the 32-bit library exists in `<FME-CONN-DIR>/runtimeFiles-windows`, 
+A copy of the 32-bit library exists in `<FME-CONN-DIR>/runtimeFiles-windows`,
 where `<FME-CONN-DIR>` is usually at `<FME-HOME-DIR>/pluginbuilder/gpudb-connector-fme`.
 
-The pair of files `gpudbapilib.lib` and `gpudbapilib.pdb` are not necessarily the latest version. 
-In order to get the latest, please visit the [Kinetica C++ API repository][KINETICA_API].  
+The pair of files `gpudbapilib.lib` and `gpudbapilib.pdb` are not necessarily the latest version.
+In order to get the latest, please visit the [Kinetica C++ API repository][KINETICA_API].
 
-To build the `gpudb-api-cpp` library, you need builds of `avro-cpp-1.8.1` and `boost_1_59_0` compiled 
+To build the `gpudb-api-cpp` library, you need builds of `avro-cpp-1.8.1` and `boost_1_59_0` compiled
 with VS 2015  (which, for some reason, are designated as vs14).
 
 [KINETICA_API]: <https://github.com/kineticadb/kinetica-api-cpp>
@@ -61,13 +61,13 @@ order to change the value of this macro, follow the following steps:
 1. Double click on **FMEConnector**.
 1. On the **FMEConnector Property Pages** dialogue box, click on **User Macros** in the pane on the left.
 1. On the right side, double click on `PP_API_PATH`.
-1. In the **Add User Macro** dialogue box that pops open, edit the value in the **Value** field such 
+1. In the **Add User Macro** dialogue box that pops open, edit the value in the **Value** field such
   	that it now has the path to the appropriate path to the `gpudb-api-cpp` project. Click **OK**.
-1. Ensure to click on **Apply** button on the **FMEConnector Property Pages** dialogue box to save the changes. 
+1. Ensure to click on **Apply** button on the **FMEConnector Property Pages** dialogue box to save the changes.
 
 ### Building on Linux
 
-The build is done using `SCons`, the tool FME uses for all their samples. You will need to change the 
+The build is done using `SCons`, the tool FME uses for all their samples. You will need to change the
 `SConscript` file to specify the location of the Kinetica, Avro, and Boost header and library files.
 
 ## Installation
@@ -83,7 +83,7 @@ kinetica.db  -> <FME-HOME-DIR>/formatsinfo
 kinetica.fmf -> <FME-HOME-DIR>/metafile
 ```
 
-The `kinetica.db` and `kinetica.fmf` files are the same for all operating sytems and 
+The `kinetica.db` and `kinetica.fmf` files are the same for all operating sytems and
 architecture (32-bit vs. 64-bit).
 
 The FME connector plug-in `kinetica.dll` is pre-built for Windows and available at these locations:
@@ -102,7 +102,7 @@ Before following this section you will need to complete the Installation steps a
 
 ### Adding a Writer
 
-The FME Writer is a component that will take output from an FME stream and insert rows into Kinetica. 
+The FME Writer is a component that will take output from an FME stream and insert rows into Kinetica.
 
 1. Select **Writers->Add Writer...**
 1. Under the **Formats** drop-down select **More Formats**.
@@ -140,27 +140,27 @@ note: As an alternative you can right click on the reader/writer and select **Ed
 
 ### Useful Transformers
 
-* **Reprojector:** Use this to convert other coordinate systems to **WGS 1984** used by Kinetica. Choose 
+* **Reprojector:** Use this to convert other coordinate systems to **WGS 1984** used by Kinetica. Choose
 	`LL-WGS84` as the destination coordinate system.
-* **Coordinate Extractor:** Extract coordinates to separate x and y columns. 
-* **Geometry Extractor:** Extract coordinates to **WKT** columns. Specify **OGC Well Known Text** as 
+* **Coordinate Extractor:** Extract coordinates to separate x and y columns.
+* **Geometry Extractor:** Extract coordinates to **WKT** columns. Specify **OGC Well Known Text** as
 	the **Geometry Encoding**.
 
 ### Useful Settings
 
-* For testing you can limit the number of rows read from the source. Select a reader from the Navigator 
-and select **Parameters-Features to Read->Max Features to Read**. 
-* Sometimes FME will read all features before sending to the reader that can cause longer execution time 
-    and/or memory errors. To fix this from the Navigator panel select 
-	**Workspace Parameters->Translation->Order Writers By**. Double click on the parameter and select 
+* For testing you can limit the number of rows read from the source. Select a reader from the Navigator
+and select **Parameters-Features to Read->Max Features to Read**.
+* Sometimes FME will read all features before sending to the reader that can cause longer execution time
+    and/or memory errors. To fix this from the Navigator panel select
+	**Workspace Parameters->Translation->Order Writers By**. Double click on the parameter and select
 	**First Feature Written** from the drop-down.
 
 ## Examples
 
-Some example workspaces are available to assist with testing in [Examples](Examples). The examples 
+Some example workspaces are available to assist with testing in [Examples](Examples). The examples
 consist of workspaces that dransfer data to/from CSV files and tables.
 
-| File Name | Type | Source | Destination | 
+| File Name | Type | Source | Destination |
 | --- | ---| --- | --- |
 | `csvToKinetica.fmw` | writer | `Examples/track_data.csv` | `test_fme_table` |
 | `KineticaToCSV.fmw` | reader | `test_fme_table` | `Examples/track_data_out.csv` |
@@ -169,8 +169,5 @@ consist of workspaces that dransfer data to/from CSV files and tables.
 
 You can use the writer examples to create tables that can then be consumed by the readers.
 
-Before running the above workspaces you will need to edit connection information in the Kinetica readers and 
+Before running the above workspaces you will need to edit connection information in the Kinetica readers and
 writers (see [Editing Connection Information](#editing-connection-information))
-
-
-                                                                                        
