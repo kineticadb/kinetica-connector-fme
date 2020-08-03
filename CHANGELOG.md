@@ -1,13 +1,17 @@
-Kinetica FME Connector Changelog
-================================
+# Kinetica FME Connector Changelog
 
-Version 7.00 -  2019-01-31
----------------------------
+## Version 7.1
+
+### Version 7.1.0.0 -- 2020-07-27
 
 -   Version release
 
-Version 6.2.0 -  2018-04-26
----------------------------
+
+## Version 7.0.0 -  2019-01-31
+
+-   Version release
+
+## Version 6.2.0 -  2018-04-26
 
 -   Changed default behavior of the writer to declare all columns (attributes)
     as nullable by default; changed the 'nullable' index property to 'not_nullable'
@@ -23,8 +27,7 @@ Version 6.2.0 -  2018-04-26
 -   Added support for charN
 
 
-Version 6.1.0 -  2018-01-05
----------------------------
+## Version 6.1.0 -  2018-01-05
 -   Added support for the following types:
     -   date (string)
     -   datetime (string)
